@@ -2,14 +2,6 @@ import torch
 
 
 def get_dataset_name(mode):
-    if mode == "ade20k":
-        return "Ade20kDataset"
-    if mode == "cityscapes":
-        return "CityscapesDataset"
-    if mode == "coco":
-        return "CocoStuffDataset"
-    if mode == "gtavtocityscapes":
-        return "GTAVToCityscapesDataset"
     if mode == "medicals":
         return "MedicalImagesDataset"
     if mode == "medicals_no_3d_noise":
