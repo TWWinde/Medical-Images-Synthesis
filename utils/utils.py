@@ -387,7 +387,7 @@ class image_saver():
             model.train()
             if not self.opt.no_EMA:
                 model.eval()
-                fake = model.module.netEMA(label,edges=edges)
+                fake = model.module.netEMA(label, edges=edges)
                 self.save_images(fake, "fake_ema", cur_iter)
                 model.train()
 
@@ -450,11 +450,10 @@ def GreyScale(tens, num_cl):
 def Colorize(tens, num_cl):
     cmap = labelcolormap(num_cl)
     cmap = torch.from_numpy(cmap[:num_cl])
-    size = tens.size()
-    print(size)
-    print(tens)
+    size = tens.size()  # [38, 256, 256]
     color_image = torch.ByteTensor(3, size[1], size[2]).fill_(0)
     tens = torch.argmax(tens, dim=0, keepdim=True)
+    print(tens)
 
     for label in range(0, len(cmap)):
         mask = (label == tens[0]).cpu()
