@@ -454,6 +454,7 @@ def Colorize(tens, num_cl):
     color_image = torch.ByteTensor(3, size[1], size[2]).fill_(0)
     tens = torch.argmax(tens, dim=0, keepdim=True)
     print(tens)
+    print(tens.size())
 
     for label in range(0, len(cmap)):
         mask = (label == tens[0]).cpu()
