@@ -96,11 +96,11 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
     def list_images(self):
         mode = "val" if self.opt.phase == "test" or self.for_metrics else "train"
         images = []
-        path_img = os.path.join(self.opt.dataroot, mode, "CT")
+        path_img = os.path.join(self.opt.dataroot, mode, "images")
         for item in sorted(os.listdir(path_img)):
             images.append(os.path.join(path_img, item))
         labels = []
-        path_lab = os.path.join(self.opt.dataroot, mode, "SEG")
+        path_lab = os.path.join(self.opt.dataroot, mode, "labels")
         for item in sorted(os.listdir(path_lab)):
             labels.append(os.path.join(path_lab, item))
         assert len(images) == len(labels), "different len of images and labels %s - %s" % (len(images), len(labels))
