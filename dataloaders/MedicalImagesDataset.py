@@ -130,6 +130,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         # to tensor
 
         label = np.asarray(label).astype(np.uint8)
+
         ''''
          unique_values1 = set()
         pixels = label.flatten().tolist()
@@ -139,6 +140,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         '''''
         image = TR.functional.to_tensor(image)
         label = torch.from_numpy(label).to(torch.uint8)
+        label = label.unsqueeze(0)
 
         # [3, 256, 256] [1, 256, 256]
         # normalize
