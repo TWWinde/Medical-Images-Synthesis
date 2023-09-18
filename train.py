@@ -28,7 +28,6 @@ metrics_computer = metrics(opt, dataloader_val)
 model = models.Unpaired_model(opt)
 model = models.put_on_multi_gpus(model, opt)
 utils.load_networks(opt, model)
-print('checkpoints successfully loaded')
 #--- create optimizers ---#
 optimizerG = torch.optim.Adam(model.module.netG.parameters(), lr=opt.lr_g, betas=(opt.beta1, opt.beta2))
 optimizerD = torch.optim.Adam(model.module.netD.parameters(), lr=opt.lr_d, betas=(opt.beta1, opt.beta2))
@@ -55,7 +54,8 @@ for epoch in range(start_epoch, opt.num_epochs):
         already_started = True
         cur_iter = epoch*len(dataloader) + i
         image, label = models.preprocess_input(opt, data_i)  ####
-
+        print('image size',image.size())
+        print('label size',label.size())
         #--- generator unconditional update ---#
         model.module.netG.zero_grad()
         loss_G, losses_G_list = model(image, label, "losses_G", losses_computer)
