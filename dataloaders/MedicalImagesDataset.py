@@ -85,6 +85,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         image = Image.open(self.images[idx]) #self.mixed_index[idx]
         #image = image.convert('RGB')
         label = Image.open(self.labels[idx])
+        label = label.
         image, label = self.transforms(image, label)
         #label = label * 255
         if self.for_supervision:
@@ -122,7 +123,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
                 label = TR.functional.hflip(label)
         # to tensor
         #image = np.asarray(image)
-        #label = np.asarray(label)
+        label = np.asarray(label).astype(np.uint8)
         #label = label.astype(np.int)
         #label = cv2.cvtColor(label, cv2.COLOR_GRAY2BGR)
         image = TR.functional.to_tensor(image)
