@@ -111,7 +111,6 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
 
     def transforms(self, image, label):
         assert image.size == label.size
-        unique_values1 = set()
         # resize
         #new_width, new_height = (int(self.opt.load_size / self.opt.aspect_ratio), self.opt.load_size)
         #image = TR.functional.crop(image, 72, 65, new_width, new_height)
@@ -125,6 +124,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
 
         label = np.asarray(label).astype(np.uint8)
         ''''
+         unique_values1 = set()
         pixels = label.flatten().tolist()
         for i in pixels:
             unique_values1.add(i)
@@ -132,8 +132,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         '''''
         image = TR.functional.to_tensor(image)
         label = TR.functional.to_tensor(label)
-        print('image',image.size())
-        print('label', label.size())
+        # [3, 256, 256] [1, 256, 256]
         # normalize
         image = TR.functional.normalize(image, [0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         return image, label
