@@ -138,7 +138,8 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         print(unique_values1)
         '''''
         image = TR.functional.to_tensor(image)
-        label = TR.functional.to_tensor(label)
+        label = torch.from_numpy(label).to(torch.uint8)
+        
         # [3, 256, 256] [1, 256, 256]
         # normalize
         image = TR.functional.normalize(image, [0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
