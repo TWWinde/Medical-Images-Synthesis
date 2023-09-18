@@ -42,7 +42,7 @@ class OASIS_Generator(nn.Module):  ##
 
         return mask
     def forward(self, input, z=None, edges=None):
-        seg = input.copy.deepcopy()
+        seg = input.clone()
         if self.opt.gpu_ids != "-1":
             seg.cuda()
         if not self.opt.no_3dnoise:
