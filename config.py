@@ -50,6 +50,7 @@ def add_all_arguments(parser, train):
     parser.add_argument('--netG', type=int, default=0, help="generator architecture")
     parser.add_argument('--mixed_images', action='store_true', help='mix images for compeletey unpaired training')
     parser.add_argument('--add_edges',action = 'store_true', help='use edges of canny detector as extra intermediate features')
+    parser.add_argument('--add_mask', action='store_true', help='use mask to improve shape consistence')
     parser.add_argument('--model_supervision', type=int, default=0,help='use edges of canny detector as extra intermediate features')
     parser.add_argument('--supervised_num', type=int, default=50,help='use edges of canny detector as extra intermediate features')
     parser.add_argument('--feature_matching_type', type=int, default=0,help='which type of feature matching to use')

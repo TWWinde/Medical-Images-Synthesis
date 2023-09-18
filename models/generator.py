@@ -35,15 +35,14 @@ class OASIS_Generator(nn.Module):  ##
         h = round(w / opt.aspect_ratio)
         return h, w
 
-    def shape_limiter(self, input):
+    def mask_gt(self, input):
         mask = torch.argmax(input, dim=1, keepdim=True)
         mask[mask != 0] = 1
         mask = mask.expand(-1, 3, -1, -1)
 
         return mask
-
     def forward(self, input, z=None, edges=None):
-        seg = input
+        seg = input.copy.deepcopy()
         if self.opt.gpu_ids != "-1":
             seg.cuda()
         if not self.opt.no_3dnoise:
@@ -73,8 +72,10 @@ class OASIS_Generator(nn.Module):  ##
             x = torch.tanh(x)
         else:
             x = self.conv_img(F.leaky_relu(x, 2e-1))
-            mask = self.shape_limiter(input)
+            ### add mask
+            mask = self.mask_gt(input)
             x = torch.mul(x, mask)
+            ####
             x = torch.tanh(x)
 
         return x

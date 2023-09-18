@@ -76,11 +76,16 @@ class Unpaired_model(nn.Module):    ##
         # --- perceptual loss ---#
         if opt.add_edges :
             self.canny_filter = CannyFilter(use_cuda= (self.opt.gpu_ids != -1) )
+        if opt.add_mask:
+            self.canny_filter = CannyFilter(use_cuda=(self.opt.gpu_ids != -1))
         if opt.phase == "train":
             if opt.add_vgg_loss:
                 self.VGG_loss = losses.VGGLoss(self.opt.gpu_ids)
             if opt.add_edge_loss:
                 self.BDCN_loss = losses.BDCNLoss(self.opt.gpu_ids)
+            if opt.add_mask:
+                self.mask_loss = torch.nn.L1Loss()
+
 
     def forward(self, image, label, mode, losses_computer):
         # Branching is applied to be compatible with DataParallel
@@ -94,6 +99,11 @@ class Unpaired_model(nn.Module):    ##
             plt.show()
         else :
             edges = None
+        if self.opt.add_mask :
+            mask = self.canny_filter(image,low_threshold = 0.1,high_threshold = 0.3,hysteresis = True)[-1].detach().float()
+        else :
+            mask = None
+
 
         if mode == "losses_G":   ###
             loss_G = 0
@@ -109,7 +119,6 @@ class Unpaired_model(nn.Module):    ##
                 loss_G += loss_G_vgg
             else:
                 loss_G_vgg = None
-
             pred_fake = self.netDu(fake)
             loss_G_GAN = self.criterionGAN(pred_fake, True).mean()
             loss_G += loss_G_GAN
@@ -119,6 +128,12 @@ class Unpaired_model(nn.Module):    ##
                 loss_G += loss_G_edge
             else:
                 loss_G_edge = None
+
+            if self.opt.add_mask:
+                loss_G_mask = self.opt.lambda_edge * self.mask_loss(label, fake )
+                loss_G += loss_G_mask
+            else:
+                loss_G_mask = None
 
             return loss_G, [loss_G_adv, loss_G_vgg, loss_G_GAN, loss_G_edge]
 
