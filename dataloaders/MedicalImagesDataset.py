@@ -85,7 +85,6 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         image = Image.open(self.images[idx]) #self.mixed_index[idx]
         #image = image.convert('RGB')
         label = Image.open(self.labels[idx])
-        label = label.
         image, label = self.transforms(image, label)
         #label = label * 255
         if self.for_supervision:
@@ -112,6 +111,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
 
     def transforms(self, image, label):
         assert image.size == label.size
+        unique_values1 = set()
         # resize
         #new_width, new_height = (int(self.opt.load_size / self.opt.aspect_ratio), self.opt.load_size)
         #image = TR.functional.crop(image, 72, 65, new_width, new_height)
@@ -124,8 +124,10 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         # to tensor
         #image = np.asarray(image)
         label = np.asarray(label).astype(np.uint8)
-        #label = label.astype(np.int)
-        #label = cv2.cvtColor(label, cv2.COLOR_GRAY2BGR)
+        pixels = label.flatten().tolist()
+        for i in pixels:
+            unique_values1.add(i)
+
         image = TR.functional.to_tensor(image)
         label = TR.functional.to_tensor(label)
         # normalize

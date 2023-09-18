@@ -54,8 +54,7 @@ for epoch in range(start_epoch, opt.num_epochs):
         already_started = True
         cur_iter = epoch*len(dataloader) + i
         image, label = models.preprocess_input(opt, data_i)  ####
-        print('image size',image.size())
-        print('label size',label.size())
+        # [bs, 3, 256, 256] [bs, 38, 256, 256]
         #--- generator unconditional update ---#
         model.module.netG.zero_grad()
         loss_G, losses_G_list = model(image, label, "losses_G", losses_computer)
@@ -111,7 +110,7 @@ for epoch in range(start_epoch, opt.num_epochs):
         #--- stats update ---#
         if not opt.no_EMA:
             utils.update_EMA(model, cur_iter, dataloader, opt)
-        if cur_iter % opt.freq_print == 0:
+        if cur_iter % 1 == 0:  #opt.freq_print
             im_saver.visualize_batch(model, image, label, cur_iter)
             timer(epoch, cur_iter)
         #if cur_iter % opt.freq_save_ckpt == 0:
