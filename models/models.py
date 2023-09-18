@@ -729,7 +729,6 @@ def preprocess_input(opt, data):
         data['label'] = data['label'].cuda()
         data['image'] = data['image'].cuda()
     label_map = data['label']
-    print(label_map.size())
    # [bs, 1, 256, 256] [bs, 3, 256, 256]
     bs, _, h, w = label_map.size()
     nc = opt.semantic_nc

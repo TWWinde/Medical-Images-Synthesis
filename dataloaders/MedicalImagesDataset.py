@@ -89,11 +89,6 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         label = np.asarray(label)
         unique_values1 = set()
         pixels = label.flatten().tolist()
-        for i in pixels:
-            unique_values1.add(i)
-        print(unique_values1)
-
-        #label = label * 255
         if self.for_supervision:
             return {"image": image, "label": label, "name": self.images[self.mixed_index[idx]],
                     "weight": self.weights[self.mixed_index[idx]]}
@@ -141,7 +136,6 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         image = TR.functional.to_tensor(image)
         label = torch.from_numpy(label).to(torch.uint8)
         label = label.unsqueeze(0)
-
         # [3, 256, 256] [1, 256, 256]
         # normalize
         image = TR.functional.normalize(image, [0.5, 0.5, 0.5], [0.5, 0.5, 0.5])

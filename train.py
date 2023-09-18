@@ -12,7 +12,7 @@ import config
 
 #--- read options ---#
 opt = config.read_arguments(train=True)
-print("nb of gpus: ", torch.cuda.device_count())
+print("number of gpus: ", torch.cuda.device_count())
 #--- create utils ---#
 timer = utils.timer(opt)
 visualizer_losses = utils.losses_saver(opt)
@@ -20,7 +20,7 @@ losses_computer = losses.losses_computer(opt)
 dataloader,dataloader_supervised, dataloader_val = dataloaders.get_dataloaders(opt)
 print('data successfully loaded')
 im_saver = utils.image_saver(opt)
-#fid_computer = fid_pytorch(opt, dataloader_val)
+fid_computer = fid_pytorch(opt, dataloader_val)
 metrics_computer = metrics(opt, dataloader_val)
 #miou_computer = miou_pytorch(opt,dataloader_val)
 
@@ -110,7 +110,7 @@ for epoch in range(start_epoch, opt.num_epochs):
         #--- stats update ---#
         if not opt.no_EMA:
             utils.update_EMA(model, cur_iter, dataloader, opt)
-        if cur_iter % 1 == 0:  #opt.freq_print
+        if cur_iter %opt.freq_print == 0:
             im_saver.visualize_batch(model, image, label, cur_iter)
             timer(epoch, cur_iter)
         #if cur_iter % opt.freq_save_ckpt == 0:
@@ -118,10 +118,10 @@ for epoch in range(start_epoch, opt.num_epochs):
         if cur_iter % opt.freq_save_latest == 0:
             utils.save_networks(opt, cur_iter, model, latest=True)
         if cur_iter % opt.freq_fid == 0 and cur_iter > 0:
-            #is_best = fid_computer.update(model, cur_iter)
+            is_best = fid_computer.update(model, cur_iter)
             metrics_computer.update_metrics(model, cur_iter)
-            #if is_best:
-                #utils.save_networks(opt, cur_iter, model, best=True)
+            if is_best:
+                utils.save_networks(opt, cur_iter, model, best=True)
            # _ = miou_computer.update(model,cur_iter)   #  do not have miou model yet
         visualizer_losses(cur_iter, losses_G_list+p_losses_G_list+losses_D_list+losses_Du_list+losses_reg_list)
 
@@ -131,7 +131,7 @@ for epoch in range(start_epoch, opt.num_epochs):
 utils.update_EMA(model, cur_iter, dataloader, opt, force_run_stats=True)
 utils.save_networks(opt, cur_iter, model)
 utils.save_networks(opt, cur_iter, model, latest=True)
-#is_best = fid_computer.update(model, cur_iter)
+is_best = fid_computer.update(model, cur_iter)
 metrics_computer.update_metrics(model, cur_iter)
 
 if is_best:
