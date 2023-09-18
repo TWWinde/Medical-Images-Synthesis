@@ -38,7 +38,7 @@ class OASIS_Generator(nn.Module):  ##
     def shape_limiter(self, input):
         mask = torch.argmax(input, dim=1, keepdim=True)
         mask[mask != 0] = 1
-        mask = mask.expand(3, -1, -1)
+        mask = mask.expand(-1, 3, -1, -1)
 
         return mask
 
