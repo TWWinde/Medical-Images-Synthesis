@@ -451,6 +451,8 @@ def Colorize(tens, num_cl):
     cmap = labelcolormap(num_cl)
     cmap = torch.from_numpy(cmap[:num_cl])
     size = tens.size()
+    print(size)
+    print(tens)
     color_image = torch.ByteTensor(3, size[1], size[2]).fill_(0)
     tens = torch.argmax(tens, dim=0, keepdim=True)
 
