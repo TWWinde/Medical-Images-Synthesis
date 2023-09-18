@@ -122,14 +122,18 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
                 image = TR.functional.hflip(image)
                 label = TR.functional.hflip(label)
         # to tensor
-        #image = np.asarray(image)
+
         label = np.asarray(label).astype(np.uint8)
+        ''''
         pixels = label.flatten().tolist()
         for i in pixels:
             unique_values1.add(i)
         print(unique_values1)
+        '''''
         image = TR.functional.to_tensor(image)
         label = TR.functional.to_tensor(label)
+        print('image',image.size())
+        print('label', label.size())
         # normalize
         image = TR.functional.normalize(image, [0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         return image, label
