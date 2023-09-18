@@ -83,12 +83,10 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         image = Image.open(self.images[idx]) #self.mixed_index[idx]
-        image = image.convert('RGB')
-        #label = nib.load(self.labels[idx])
-        #label = label.get_fdata()
+        #image = image.convert('RGB')
         label = Image.open(self.labels[idx])
         image, label = self.transforms(image, label)
-        label = label * 255
+        #label = label * 255
         if self.for_supervision:
             return {"image": image, "label": label, "name": self.images[self.mixed_index[idx]],
                     "weight": self.weights[self.mixed_index[idx]]}
@@ -114,19 +112,19 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
     def transforms(self, image, label):
         assert image.size == label.size
         # resize
-        new_width, new_height = (int(self.opt.load_size / self.opt.aspect_ratio), self.opt.load_size)
-        image = TR.functional.crop(image, 72, 65, new_width, new_height)
-        label = TR.functional.crop(label, 72, 65, new_width, new_height)
+        #new_width, new_height = (int(self.opt.load_size / self.opt.aspect_ratio), self.opt.load_size)
+        #image = TR.functional.crop(image, 72, 65, new_width, new_height)
+        #label = TR.functional.crop(label, 72, 65, new_width, new_height)
         # flip
         if not (self.opt.phase == "test" or self.opt.phase != "train" or self.opt.no_flip or self.for_metrics):
             if random.random() < 0.5:
                 image = TR.functional.hflip(image)
                 label = TR.functional.hflip(label)
         # to tensor
-        image = np.asarray(image)
-        label = np.asarray(label)
+        #image = np.asarray(image)
+        #label = np.asarray(label)
         #label = label.astype(np.int)
-        label = cv2.cvtColor(label, cv2.COLOR_GRAY2BGR)
+        #label = cv2.cvtColor(label, cv2.COLOR_GRAY2BGR)
         image = TR.functional.to_tensor(image)
         label = TR.functional.to_tensor(label)
         # normalize

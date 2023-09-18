@@ -32,7 +32,7 @@ module load cuda/11.3
 #--num_epochs 500
 
 CUDA_VISIBLE_DEVICES=0 python train.py --name medicals --dataset_mode medicals --gpu_ids 0 \
---dataroot /misc/data/private/autoPET  \
+--dataroot /misc/data/private/autoPET/data_nnunet  \
 --batch_size 2 --model_supervision 0  \
 --Du_patch_size 32 --netDu wavelet  \
 --netG 0 --channels_G 64 \

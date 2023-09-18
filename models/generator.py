@@ -52,12 +52,11 @@ class OASIS_Generator(nn.Module):  ##
         x = self.fc(x)
         out = None
         for i in range(self.opt.num_res_blocks):
-            x = self.body[i](x, seg,edges)   # ResnetBlock_with_SPADE
-
+            x = self.body[i](x, seg, edges)   # ResnetBlock_with_SPADE
             if self.opt.progressive_growing and out == None :
                 out = self.torgbs[i](x)
-            elif self.opt.progressive_growing :
-                out = self.torgbs[i](x,skip = out)
+            elif self.opt.progressive_growing:
+                out = self.torgbs[i](x, skip=out)
 
             if i < self.opt.num_res_blocks-1:
                 x = self.up(x)  # Up-sampling
