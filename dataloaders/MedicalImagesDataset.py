@@ -86,6 +86,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         #image = image.convert('RGB')
         label = Image.open(self.labels[idx])
         image, label = self.transforms(image, label)
+        print(label)
         #label = label * 255
         if self.for_supervision:
             return {"image": image, "label": label, "name": self.images[self.mixed_index[idx]],
