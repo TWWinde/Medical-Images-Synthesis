@@ -127,7 +127,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         pixels = label.flatten().tolist()
         for i in pixels:
             unique_values1.add(i)
-
+        print(unique_values1)
         image = TR.functional.to_tensor(image)
         label = TR.functional.to_tensor(label)
         # normalize
