@@ -1,3 +1,4 @@
+from models.mask_filter import MaskFilter
 from models.sync_batchnorm import DataParallelWithCallback
 import models.generator as generators
 import models.discriminator as discriminators
@@ -77,7 +78,7 @@ class Unpaired_model(nn.Module):    ##
         if opt.add_edges :
             self.canny_filter = CannyFilter(use_cuda= (self.opt.gpu_ids != -1) )
         if opt.add_mask:
-            self.canny_filter = CannyFilter(use_cuda=(self.opt.gpu_ids != -1))
+            self.mask_filter = MaskFilter(use_cuda=(self.opt.gpu_ids != -1))
         if opt.phase == "train":
             if opt.add_vgg_loss:
                 self.VGG_loss = losses.VGGLoss(self.opt.gpu_ids)
@@ -99,11 +100,6 @@ class Unpaired_model(nn.Module):    ##
             plt.show()
         else :
             edges = None
-        if self.opt.add_mask :
-            mask = self.canny_filter(image,low_threshold = 0.1,high_threshold = 0.3,hysteresis = True)[-1].detach().float()
-        else :
-            mask = None
-
 
         if mode == "losses_G":   ###
             loss_G = 0
@@ -128,14 +124,16 @@ class Unpaired_model(nn.Module):    ##
                 loss_G += loss_G_edge
             else:
                 loss_G_edge = None
-
+             ###### ############add_mask
             if self.opt.add_mask:
-                loss_G_mask = self.opt.lambda_edge * self.mask_loss(label, fake )
+                label_mask = self.mask_filter(label, label=True).float()
+                image_mask = self.mask_filter(fake, label=False).float()
+                loss_G_mask = self.opt.lambda_edge * self.mask_loss(label_mask, image_mask)
                 loss_G += loss_G_mask
             else:
                 loss_G_mask = None
 
-            return loss_G, [loss_G_adv, loss_G_vgg, loss_G_GAN, loss_G_edge]
+            return loss_G, [loss_G_adv, loss_G_vgg, loss_G_GAN, loss_G_edge, loss_G_mask]
 
         if mode == "losses_G_supervised":
             loss_G = 0

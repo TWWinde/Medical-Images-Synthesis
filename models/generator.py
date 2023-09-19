@@ -74,9 +74,9 @@ class OASIS_Generator(nn.Module):  ##
             x = self.conv_img(F.leaky_relu(x, 2e-1))
             x = torch.tanh(x)
             ### add mask
-            mask1, mask2 = self.mask_gt(input)
-            x = torch.mul(x, mask1)
-            x = x - mask2
+            # mask1, mask2 = self.mask_gt(input)
+            # x = torch.mul(x, mask1)
+            # x = x - mask2
             ####
         return x
 
