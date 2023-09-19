@@ -37,10 +37,10 @@ class OASIS_Generator(nn.Module):  ##
 
     def mask_gt(self, input):
         mask = torch.argmax(input, dim=1, keepdim=True)
-        mask[mask != 0] = 1
-        mask = mask.expand(-1, 3, -1, -1)
-
-        return mask
+        mask[mask != 0] = 1  # background set to 0
+        mask1 = mask.expand(-1, 3, -1, -1)
+        mask2 = torch.ones_like(mask1) - mask1 # background set to 1
+        return mask1, mask2
     def forward(self, input, z=None, edges=None):
         seg = input.clone()
         if self.opt.gpu_ids != "-1":
@@ -72,12 +72,12 @@ class OASIS_Generator(nn.Module):  ##
             x = torch.tanh(x)
         else:
             x = self.conv_img(F.leaky_relu(x, 2e-1))
-            ### add mask
-            mask = self.mask_gt(input)
-            x = torch.mul(x, mask)
-            ####
             x = torch.tanh(x)
-
+            ### add mask
+            mask1, mask2 = self.mask_gt(input)
+            x = torch.mul(x, mask1)
+            x = x - mask2
+            ####
         return x
 
     def forward_determinstic(self, input, noise_vector):
