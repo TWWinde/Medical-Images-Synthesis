@@ -76,6 +76,7 @@ def add_all_arguments(parser, train):
         parser.add_argument('--lambda_vgg', type=float, default=10.0, help='weight for VGG loss')
         parser.add_argument('--add_edge_loss', action='store_true', help='if specified, add VGG feature matching loss')
         parser.add_argument('--lambda_edge', type=float, default=1, help='weight for VGG loss')
+        parser.add_argument('--lambda_mask', type=float, default=0.5, help='weight for mask loss')
         parser.add_argument('--no_balancing_inloss', action='store_true', default=False, help='if specified, do *not* use class balancing in the loss function')
         parser.add_argument('--no_labelmix', action='store_true', default=False, help='if specified, do *not* use LabelMix')
         parser.add_argument('--lambda_labelmix', type=float, default=10.0, help='weight for LabelMix regularization')
