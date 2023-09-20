@@ -27,9 +27,8 @@ class MaskFilter(nn.Module):
     def get_3d_mask(self, img, min_, max_=None, th=55, width=40, label=True):
         if max_ is None:
             max_ = img.max()
-        if not label:
-            min_ = -1
-        img = torch.clamp(img, min_, max_)
+            print()
+        #img = torch.clamp(img, min_, max_)
         img = (255 * self.normalize(img, min_, max_)).to(torch.uint8)
         ## Remove small details
         img = F.gaussian_blur(img, kernel_size=[5, 5])
