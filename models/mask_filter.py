@@ -37,7 +37,7 @@ class MaskFilter(nn.Module):
         mask = torch.zeros_like(img, dtype=torch.int32)
         if not label:
             mask[img > th] = 1
-            mask = morphology.binary_opening(mask.numpy(), )
+            mask = morphology.binary_opening(mask.cpu().numpy(), )
 
             mask = morphology.remove_small_holes(
                 mask,
@@ -45,7 +45,7 @@ class MaskFilter(nn.Module):
 
         else:
             mask[img > 0] = 1
-            mask = morphology.binary_opening(mask.numpy(), )
+            mask = morphology.binary_opening(mask.cpu().numpy(), )
 
             mask = morphology.remove_small_holes(
                 mask,
@@ -60,7 +60,10 @@ class MaskFilter(nn.Module):
             input = input.expand(-1, 3, -1, -1)
         B, C, H, W = input.shape
         #mask = torch.zeros((B, C, H, W)).to(self.device)
-        mask = self.get_3d_mask(input, min_=0, label=label)
+        if label:
+            mask = self.get_3d_mask(input, min_=0, label=label)
+        else:
+            mask = self.get_3d_mask(input, min_=-1, label=label)
 
         return mask     # * 255
 
