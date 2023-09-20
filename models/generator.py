@@ -67,7 +67,7 @@ class OASIS_Generator(nn.Module):  ##
         else:
             x = self.conv_img(F.leaky_relu(x, 2e-1))
             x = torch.tanh(x)
-           
+
         return x
 
     def forward_determinstic(self, input, noise_vector):
