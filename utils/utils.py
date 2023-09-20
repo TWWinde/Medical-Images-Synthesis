@@ -152,7 +152,7 @@ class losses_saver():
                               "un_Du_regularize",
                               "sup_Du_regularize"]
         else:
-            self.name_list = ["Generator", "Vgg", "GAN","edge",'featMatch',"D_fake", "D_real", "LabelMix","Du_fake","Du_real","Du_regularize"]
+            self.name_list = ["Generator", "Vgg", "GAN","edge","mask",'featMatch',"D_fake", "D_real", "LabelMix","Du_fake","Du_real","Du_regularize"]
         self.opt = opt
         self.freq_smooth_loss = opt.freq_smooth_loss
         self.freq_save_loss = opt.freq_save_loss
