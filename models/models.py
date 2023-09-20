@@ -130,7 +130,7 @@ class Unpaired_model(nn.Module):    ##
                 label_mask = self.mask_filter(label, label=True).float()
                 image_mask = self.mask_filter(fake, label=False).float()
                 loss_G_mask = self.opt.lambda_edge * self.mask_loss(label_mask, image_mask)
-                print(loss_G_mask)
+                print('mask loss',loss_G_mask)
                 loss_G += loss_G_mask
             else:
                 loss_G_mask = None
