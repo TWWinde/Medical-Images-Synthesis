@@ -7,10 +7,14 @@ import models.models as models
 from utils.fid_folder.inception import InceptionV3
 import matplotlib.pyplot as plt
 from utils import utils
+from utils.miou_folder.nnunet_segment import get_predicted_label, compute_miou
+
 
 # --------------------------------------------------------------------------#
 # This code is an adapted version of https://github.com/mseitzer/pytorch-fid
 # --------------------------------------------------------------------------#
+
+
 
 class miou_pytorch():
     def __init__(self, opt, dataloader_val):
@@ -27,6 +31,8 @@ class miou_pytorch():
             netEMA.eval()
         with torch.no_grad():
             for i, data_i in enumerate(self.val_dataloader):
+                if i >10:
+                    break
                 image, label = models.preprocess_input(self.opt, data_i)
                 edges = model.module.compute_edges(image)
                 if self.opt.no_EMA:
@@ -34,9 +40,12 @@ class miou_pytorch():
                 else:
                     generated = netEMA(label,edges=edges)
                 image_saver(label, generated, data_i["name"])
-
+            get_predicted_label(self.opt, current_iter)
             if self.opt.dataset_mode == "medicals" or self.opt.dataset_mode == "medicals_no_3d_noise":
-                answer = deeplab_v2_miou(self.opt.results_dir, self.opt.name, str(current_iter))
+                pred_folder = os.path.join(self.opt.results_dir, self.opt.name, str(current_iter), 'segmentation')
+                gt_folder = os.path.join(self.opt.results_dir, self.opt.name, str(current_iter), 'label')
+                answer = compute_miou(self.opt, pred_folder, gt_folder)
+
         netG.train()
         if not self.opt.no_EMA:
             netEMA.train()

@@ -6,6 +6,7 @@ from copy import deepcopy
 from time import sleep
 from typing import Tuple, Union, List, Optional
 
+import cv2
 import numpy as np
 import torch
 from acvl_utils.cropping_and_padding.padding import pad_nd_image
@@ -13,12 +14,14 @@ from batchgenerators.dataloading.multi_threaded_augmenter import MultiThreadedAu
 from batchgenerators.utilities.file_and_folder_operations import load_json, join, isfile, maybe_mkdir_p, isdir, subdirs, \
     save_json
 from torch import nn
-#from torch._dynamo import OptimizedModule
+# from torch._dynamo import OptimizedModule
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
 import sys
+
 sys.path.append("/no_backups/s1449/nnUNetFrame/nnUNet/nnunetv2")
 import os
+
 os.environ["PYTHONPATH"] = "/no_backups/s1449/nnUNetFrame/nnUNet:" + os.environ.get("PYTHONPATH", "")
 import nnunetv2
 from nnunetv2.configuration import default_num_processes
@@ -52,7 +55,7 @@ class nnUNetPredictor(object):
         self.allow_tqdm = allow_tqdm
 
         self.plans_manager, self.configuration_manager, self.list_of_parameters, self.network, self.dataset_json, \
-        self.trainer_name, self.allowed_mirroring_axes, self.label_manager = None, None, None, None, None, None, None, None
+            self.trainer_name, self.allowed_mirroring_axes, self.label_manager = None, None, None, None, None, None, None, None
 
         self.tile_step_size = tile_step_size
         self.use_gaussian = use_gaussian
@@ -112,7 +115,7 @@ class nnUNetPredictor(object):
         self.allowed_mirroring_axes = inference_allowed_mirroring_axes
         self.label_manager = plans_manager.get_label_manager(dataset_json)
         if ('nnUNet_compile' in os.environ.keys()) and (os.environ['nnUNet_compile'].lower() in ('true', '1', 't')):
-               # \and not isinstance(self.network, OptimizedModule)
+            # \and not isinstance(self.network, OptimizedModule)
             print('compiling network')
             self.network = torch.compile(self.network)
 
@@ -132,10 +135,11 @@ class nnUNetPredictor(object):
         self.allowed_mirroring_axes = inference_allowed_mirroring_axes
         self.label_manager = plans_manager.get_label_manager(dataset_json)
         allow_compile = True
-        allow_compile = allow_compile and ('nnUNet_compile' in os.environ.keys()) and (os.environ['nnUNet_compile'].lower() in ('true', '1', 't'))
-        allow_compile = allow_compile #and not isinstance(self.network, OptimizedModule)
+        allow_compile = allow_compile and ('nnUNet_compile' in os.environ.keys()) and (
+                os.environ['nnUNet_compile'].lower() in ('true', '1', 't'))
+        allow_compile = allow_compile  # and not isinstance(self.network, OptimizedModule)
         if isinstance(self.network, DistributedDataParallel):
-            allow_compile = allow_compile #and isinstance(self.network.module, OptimizedModule)
+            allow_compile = allow_compile  # and isinstance(self.network.module, OptimizedModule)
         if allow_compile:
             print('compiling network')
             self.network = torch.compile(self.network)
@@ -277,9 +281,9 @@ class nnUNetPredictor(object):
     def get_data_iterator_from_raw_npy_data(self,
                                             image_or_list_of_images: Union[np.ndarray, List[np.ndarray]],
                                             segs_from_prev_stage_or_list_of_segs_from_prev_stage: Union[None,
-                                                                                                        np.ndarray,
-                                                                                                        List[
-                                                                                                            np.ndarray]],
+                                            np.ndarray,
+                                            List[
+                                                np.ndarray]],
                                             properties_or_list_of_properties: Union[dict, List[dict]],
                                             truncated_ofname: Union[str, List[str], None],
                                             num_processes: int = 3):
@@ -316,9 +320,9 @@ class nnUNetPredictor(object):
     def predict_from_list_of_npy_arrays(self,
                                         image_or_list_of_images: Union[np.ndarray, List[np.ndarray]],
                                         segs_from_prev_stage_or_list_of_segs_from_prev_stage: Union[None,
-                                                                                                    np.ndarray,
-                                                                                                    List[
-                                                                                                        np.ndarray]],
+                                        np.ndarray,
+                                        List[
+                                            np.ndarray]],
                                         properties_or_list_of_properties: Union[dict, List[dict]],
                                         truncated_ofname: Union[str, List[str], None],
                                         num_processes: int = 3,
@@ -350,12 +354,12 @@ class nnUNetPredictor(object):
                     os.remove(delfile)
 
                 ofile = preprocessed['ofile']  # output path
-                #if ofile is not None:
-                    #print(f'\nPredicting {os.path.basename(ofile)}:')
-                #else:
-                    #print(f'\nPredicting image of shape {data.shape}:')
+                # if ofile is not None:
+                # print(f'\nPredicting {os.path.basename(ofile)}:')
+                # else:
+                # print(f'\nPredicting image of shape {data.shape}:')
 
-                #print(f'perform_everything_on_gpu: {self.perform_everything_on_gpu}')
+                # print(f'perform_everything_on_gpu: {self.perform_everything_on_gpu}')
 
                 properties = preprocessed['data_properites']
 
@@ -418,43 +422,6 @@ class nnUNetPredictor(object):
         empty_cache(self.device)
         return ret
 
-    def predict_single_npy_array(self, input_image: np.ndarray, image_properties: dict,
-                                 segmentation_previous_stage: np.ndarray = None,
-                                 output_file_truncated: str = None,
-                                 save_or_return_probabilities: bool = False):
-        """
-        image_properties must only have a 'spacing' key!
-        """
-        ppa = PreprocessAdapterFromNpy([input_image], [segmentation_previous_stage], [image_properties],
-                                       [output_file_truncated],
-                                       self.plans_manager, self.dataset_json, self.configuration_manager,
-                                       num_threads_in_multithreaded=1, verbose=self.verbose)
-        if self.verbose:
-            print('preprocessing')
-        dct = next(ppa)
-
-        if self.verbose:
-            print('predicting')
-        predicted_logits = self.predict_logits_from_preprocessed_data(dct['data']).cpu()
-
-        if self.verbose:
-            print('resampling to original shape')
-        if output_file_truncated is not None:
-            export_prediction_from_logits(predicted_logits, dct['data_properites'], self.configuration_manager,
-                                          self.plans_manager, self.dataset_json, output_file_truncated,
-                                          save_or_return_probabilities)
-        else:
-            ret = convert_predicted_logits_to_segmentation_with_correct_shape(predicted_logits, self.plans_manager,
-                                                                              self.configuration_manager,
-                                                                              self.label_manager,
-                                                                              dct['data_properites'],
-                                                                              return_probabilities=
-                                                                              save_or_return_probabilities)
-            if save_or_return_probabilities:
-                return ret[0], ret[1]
-            else:
-                return ret
-
     def predict_logits_from_preprocessed_data(self, data: torch.Tensor) -> torch.Tensor:
         """
         IMPORTANT! IF YOU ARE RUNNING THE CASCADE, THE SEGMENTATION FROM THE PREVIOUS STAGE MUST ALREADY BE STACKED ON
@@ -474,10 +441,10 @@ class nnUNetPredictor(object):
                     for params in self.list_of_parameters:
 
                         # messing with state dict names...
-                        #if not isinstance(self.network, OptimizedModule):
+                        # if not isinstance(self.network, OptimizedModule):
                         self.network.load_state_dict(params)
-                        #else:
-                            #self.network._orig_mod.load_state_dict(params)
+                        # else:
+                        # self.network._orig_mod.load_state_dict(params)
 
                         if prediction is None:
                             prediction = self.predict_sliding_window_return_logits(data)
@@ -498,10 +465,10 @@ class nnUNetPredictor(object):
             if prediction is None:
                 for params in self.list_of_parameters:
                     # messing with state dict names...
-                    #if not isinstance(self.network, OptimizedModule):
+                    # if not isinstance(self.network, OptimizedModule):
                     self.network.load_state_dict(params)
-                    #else:
-                        #self.network._orig_mod.load_state_dict(params)
+                    # else:
+                    # self.network._orig_mod.load_state_dict(params)
 
                     if prediction is None:
                         prediction = self.predict_sliding_window_return_logits(data)
@@ -650,232 +617,12 @@ class nnUNetPredictor(object):
         return predicted_logits[tuple([slice(None), *slicer_revert_padding[1:]])]
 
 
-def predict_entry_point_modelfolder():
-    import argparse
-    parser = argparse.ArgumentParser(description='Use this to run inference with nnU-Net. This function is used when '
-                                                 'you want to manually specify a folder containing a trained nnU-Net '
-                                                 'model. This is useful when the nnunet environment variables '
-                                                 '(nnUNet_results) are not set.')
-    parser.add_argument('-i', type=str, required=True,
-                        help='input folder. Remember to use the correct channel numberings for your files (_0000 etc). '
-                             'File endings must be the same as the training dataset!')
-    parser.add_argument('-o', type=str, required=True,
-                        help='Output folder. If it does not exist it will be created. Predicted segmentations will '
-                             'have the same name as their source images.')
-    parser.add_argument('-m', type=str, required=True,
-                        help='Folder in which the trained model is. Must have subfolders fold_X for the different '
-                             'folds you trained')
-    parser.add_argument('-f', nargs='+', type=str, required=False, default=(0, 1, 2, 3, 4),
-                        help='Specify the folds of the trained model that should be used for prediction. '
-                             'Default: (0, 1, 2, 3, 4)')
-    parser.add_argument('-step_size', type=float, required=False, default=0.5,
-                        help='Step size for sliding window prediction. The larger it is the faster but less accurate '
-                             'the prediction. Default: 0.5. Cannot be larger than 1. We recommend the default.')
-    parser.add_argument('--disable_tta', action='store_true', required=False, default=False,
-                        help='Set this flag to disable test time data augmentation in the form of mirroring. Faster, '
-                             'but less accurate inference. Not recommended.')
-    parser.add_argument('--verbose', action='store_true', help="Set this if you like being talked to. You will have "
-                                                               "to be a good listener/reader.")
-    parser.add_argument('--save_probabilities', action='store_true',
-                        help='Set this to export predicted class "probabilities". Required if you want to ensemble '
-                             'multiple configurations.')
-    parser.add_argument('--continue_prediction', '--c', action='store_true',
-                        help='Continue an aborted previous prediction (will not overwrite existing files)')
-    parser.add_argument('-chk', type=str, required=False, default='checkpoint_final.pth',
-                        help='Name of the checkpoint you want to use. Default: checkpoint_final.pth')
-    parser.add_argument('-npp', type=int, required=False, default=3,
-                        help='Number of processes used for preprocessing. More is not always better. Beware of '
-                             'out-of-RAM issues. Default: 3')
-    parser.add_argument('-nps', type=int, required=False, default=3,
-                        help='Number of processes used for segmentation export. More is not always better. Beware of '
-                             'out-of-RAM issues. Default: 3')
-    parser.add_argument('-prev_stage_predictions', type=str, required=False, default=None,
-                        help='Folder containing the predictions of the previous stage. Required for cascaded models.')
-    parser.add_argument('-device', type=str, default='cuda', required=False,
-                        help="Use this to set the device the inference should run with. Available options are 'cuda' "
-                             "(GPU), 'cpu' (CPU) and 'mps' (Apple M1/M2). Do NOT use this to set which GPU ID! "
-                             "Use CUDA_VISIBLE_DEVICES=X nnUNetv2_predict [...] instead!")
-
-    print(
-        "\n#######################################################################\nPlease cite the following paper "
-        "when using nnU-Net:\n"
-        "Isensee, F., Jaeger, P. F., Kohl, S. A., Petersen, J., & Maier-Hein, K. H. (2021). "
-        "nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. "
-        "Nature methods, 18(2), 203-211.\n#######################################################################\n")
-
-    args = parser.parse_args()
-    args.f = [i if i == 'all' else int(i) for i in args.f]
-
-    if not isdir(args.o):
-        maybe_mkdir_p(args.o)
-
-    assert args.device in ['cpu', 'cuda',
-                           'mps'], f'-device must be either cpu, mps or cuda. Other devices are not tested/supported. Got: {args.device}.'
-    if args.device == 'cpu':
-        # let's allow torch to use hella threads
-        import multiprocessing
-        torch.set_num_threads(multiprocessing.cpu_count())
-        device = torch.device('cpu')
-    elif args.device == 'cuda':
-        # multithreading in torch doesn't help nnU-Net if run on GPU
-        torch.set_num_threads(1)
-        torch.set_num_interop_threads(1)
-        device = torch.device('cuda')
-    else:
-        device = torch.device('mps')
-
-    predictor = nnUNetPredictor(tile_step_size=args.step_size,
-                                use_gaussian=True,
-                                use_mirroring=not args.disable_tta,
-                                perform_everything_on_gpu=True,
-                                device=device,
-                                verbose=args.verbose)
-    predictor.initialize_from_trained_model_folder(args.m, args.f, args.chk)
-    predictor.predict_from_files(args.i, args.o, save_probabilities=args.save_probabilities,
-                                 overwrite=not args.continue_prediction,
-                                 num_processes_preprocessing=args.npp,
-                                 num_processes_segmentation_export=args.nps,
-                                 folder_with_segs_from_prev_stage=args.prev_stage_predictions,
-                                 num_parts=1, part_id=0)
+from nnunetv2.paths import nnUNet_results, nnUNet_raw
 
 
-def predict_entry_point():
-    import argparse
-    parser = argparse.ArgumentParser(description='Use this to run inference with nnU-Net. This function is used when '
-                                                 'you want to manually specify a folder containing a trained nnU-Net '
-                                                 'model. This is useful when the nnunet environment variables '
-                                                 '(nnUNet_results) are not set.')
-    parser.add_argument('-i', type=str, required=True,
-                        help='input folder. Remember to use the correct channel numberings for your files (_0000 etc). '
-                             'File endings must be the same as the training dataset!')
-    parser.add_argument('-o', type=str, required=True,
-                        help='Output folder. If it does not exist it will be created. Predicted segmentations will '
-                             'have the same name as their source images.')
-    parser.add_argument('-d', type=str, required=True,
-                        help='Dataset with which you would like to predict. You can specify either dataset name or id')
-    parser.add_argument('-p', type=str, required=False, default='nnUNetPlans',
-                        help='Plans identifier. Specify the plans in which the desired configuration is located. '
-                             'Default: nnUNetPlans')
-    parser.add_argument('-tr', type=str, required=False, default='nnUNetTrainer',
-                        help='What nnU-Net trainer class was used for training? Default: nnUNetTrainer')
-    parser.add_argument('-c', type=str, required=True,
-                        help='nnU-Net configuration that should be used for prediction. Config must be located '
-                             'in the plans specified with -p')
-    parser.add_argument('-f', nargs='+', type=str, required=False, default=(0, 1, 2, 3, 4),
-                        help='Specify the folds of the trained model that should be used for prediction. '
-                             'Default: (0, 1, 2, 3, 4)')
-    parser.add_argument('-step_size', type=float, required=False, default=0.5,
-                        help='Step size for sliding window prediction. The larger it is the faster but less accurate '
-                             'the prediction. Default: 0.5. Cannot be larger than 1. We recommend the default.')
-    parser.add_argument('--disable_tta', action='store_true', required=False, default=False,
-                        help='Set this flag to disable test time data augmentation in the form of mirroring. Faster, '
-                             'but less accurate inference. Not recommended.')
-    parser.add_argument('--verbose', action='store_true', help="Set this if you like being talked to. You will have "
-                                                               "to be a good listener/reader.")
-    parser.add_argument('--save_probabilities', action='store_true',
-                        help='Set this to export predicted class "probabilities". Required if you want to ensemble '
-                             'multiple configurations.')
-    parser.add_argument('--continue_prediction', action='store_true',
-                        help='Continue an aborted previous prediction (will not overwrite existing files)')
-    parser.add_argument('-chk', type=str, required=False, default='checkpoint_final.pth',
-                        help='Name of the checkpoint you want to use. Default: checkpoint_final.pth')
-    parser.add_argument('-npp', type=int, required=False, default=3,
-                        help='Number of processes used for preprocessing. More is not always better. Beware of '
-                             'out-of-RAM issues. Default: 3')
-    parser.add_argument('-nps', type=int, required=False, default=3,
-                        help='Number of processes used for segmentation export. More is not always better. Beware of '
-                             'out-of-RAM issues. Default: 3')
-    parser.add_argument('-prev_stage_predictions', type=str, required=False, default=None,
-                        help='Folder containing the predictions of the previous stage. Required for cascaded models.')
-    parser.add_argument('-num_parts', type=int, required=False, default=1,
-                        help='Number of separate nnUNetv2_predict call that you will be making. Default: 1 (= this one '
-                             'call predicts everything)')
-    parser.add_argument('-part_id', type=int, required=False, default=0,
-                        help='If multiple nnUNetv2_predict exist, which one is this? IDs start with 0 can end with '
-                             'num_parts - 1. So when you submit 5 nnUNetv2_predict calls you need to set -num_parts '
-                             '5 and use -part_id 0, 1, 2, 3 and 4. Simple, right? Note: You are yourself responsible '
-                             'to make these run on separate GPUs! Use CUDA_VISIBLE_DEVICES (google, yo!)')
-    parser.add_argument('-device', type=str, default='cuda', required=False,
-                        help="Use this to set the device the inference should run with. Available options are 'cuda' "
-                             "(GPU), 'cpu' (CPU) and 'mps' (Apple M1/M2). Do NOT use this to set which GPU ID! "
-                             "Use CUDA_VISIBLE_DEVICES=X nnUNetv2_predict [...] instead!")
-
-    print(
-        "\n#######################################################################\nPlease cite the following paper "
-        "when using nnU-Net:\n"
-        "Isensee, F., Jaeger, P. F., Kohl, S. A., Petersen, J., & Maier-Hein, K. H. (2021). "
-        "nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. "
-        "Nature methods, 18(2), 203-211.\n#######################################################################\n")
-
-    args = parser.parse_args()
-    args.f = [i if i == 'all' else int(i) for i in args.f]
-
-    model_folder = get_output_folder(args.d, args.tr, args.p, args.c)
-
-    if not isdir(args.o):
-        maybe_mkdir_p(args.o)
-
-    # slightly passive agressive haha
-    assert args.part_id < args.num_parts, 'Do you even read the documentation? See nnUNetv2_predict -h.'
-
-    assert args.device in ['cpu', 'cuda',
-                           'mps'], f'-device must be either cpu, mps or cuda. Other devices are not tested/supported. Got: {args.device}.'
-    if args.device == 'cpu':
-        # let's allow torch to use hella threads
-        import multiprocessing
-        torch.set_num_threads(multiprocessing.cpu_count())
-        device = torch.device('cpu')
-    elif args.device == 'cuda':
-        # multithreading in torch doesn't help nnU-Net if run on GPU
-        torch.set_num_threads(1)
-        torch.set_num_interop_threads(1)
-        device = torch.device('cuda')
-    else:
-        device = torch.device('mps')
-
-    predictor = nnUNetPredictor(tile_step_size=args.step_size,
-                                use_gaussian=True,
-                                use_mirroring=not args.disable_tta,
-                                perform_everything_on_gpu=True,
-                                device=device,
-                                verbose=args.verbose,
-                                verbose_preprocessing=False)
-    predictor.initialize_from_trained_model_folder(
-        model_folder,
-        args.f,
-        checkpoint_name=args.chk
-    )
-    predictor.predict_from_files(args.i, args.o, save_probabilities=args.save_probabilities,
-                                 overwrite=not args.continue_prediction,
-                                 num_processes_preprocessing=args.npp,
-                                 num_processes_segmentation_export=args.nps,
-                                 folder_with_segs_from_prev_stage=args.prev_stage_predictions,
-                                 num_parts=args.num_parts,
-                                 part_id=args.part_id)
-    # r = predict_from_raw_data(args.i,
-    #                           args.o,
-    #                           model_folder,
-    #                           args.f,
-    #                           args.step_size,
-    #                           use_gaussian=True,
-    #                           use_mirroring=not args.disable_tta,
-    #                           perform_everything_on_gpu=True,
-    #                           verbose=args.verbose,
-    #                           save_probabilities=args.save_probabilities,
-    #                           overwrite=not args.continue_prediction,
-    #                           checkpoint_name=args.chk,
-    #                           num_processes_preprocessing=args.npp,
-    #                           num_processes_segmentation_export=args.nps,
-    #                           folder_with_segs_from_prev_stage=args.prev_stage_predictions,
-    #                           num_parts=args.num_parts,
-    #                           part_id=args.part_id,
-    #                           device=device)
-
-
-if __name__ == '__main__':
-    # predict a bunch of files
-    from nnunetv2.paths import nnUNet_results, nnUNet_raw
-
+def get_predicted_label(opt, current_iteration):
+    path_save = os.path.join(opt.results_dir, opt.name, current_iteration, "segmentartion")
+    path_read = os.path.join(opt.results_dir, opt.name, current_iteration, "image")
     predictor = nnUNetPredictor(
         tile_step_size=0.5,
         use_gaussian=True,
@@ -891,8 +638,40 @@ if __name__ == '__main__':
         use_folds=(0,),
         checkpoint_name='checkpoint_final.pth',
     )
-    predictor.predict_from_files(join(nnUNet_raw, 'Dataset522_body/imagesTs'),
-                                 join(nnUNet_raw, 'Dataset522_body/imagesTs_predlowres'),
+    predictor.predict_from_files(join(nnUNet_raw, path_read),
+                                 join(nnUNet_raw, path_save),
                                  save_probabilities=False, overwrite=False,
                                  num_processes_preprocessing=2, num_processes_segmentation_export=2,
                                  folder_with_segs_from_prev_stage=None, num_parts=1, part_id=0)
+
+
+import os
+
+
+def compute_iou(pred_mask, gt_mask):
+    intersection = np.logical_and(pred_mask, gt_mask)
+    union = np.logical_or(pred_mask, gt_mask)
+    iou = np.sum(intersection) / np.sum(union)
+    return iou
+
+
+def compute_miou(opt, pred_folder, gt_folder):
+    pred_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
+    gt_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
+    num_classes = opt.label_nc
+    class_ious = np.zeros(num_classes)
+    for class_idx in range(num_classes):
+        ious = []
+        for pred_file, gt_file in zip(pred_files, gt_files):
+            pred_mask = np.array(cv2.imread(os.path.join(pred_folder, pred_file))) == class_idx
+            gt_mask = np.array(cv2.imread(os.path.join(gt_folder, gt_file))) == class_idx
+            iou = compute_iou(pred_mask, gt_mask)
+            ious.append(iou)
+
+        class_ious[class_idx] = np.mean(ious)
+
+    mIoU = np.mean(class_ious)
+
+    return mIoU
+
+

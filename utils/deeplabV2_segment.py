@@ -135,6 +135,4 @@ def test(validation_list):
     print('mIoU: ', score["Mean IoU"])
     return score["Mean IoU"]
 
-    '''with open(save_path, "w") as f:
-        json.dump(score, f, indent=4, sort_keys=True)'''
 
