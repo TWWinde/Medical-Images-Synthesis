@@ -9,7 +9,7 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils import data
 import nibabel as nib
-
+import re
 class MedicalImagesDataset(torch.utils.data.Dataset):
     def __init__(self, opt, for_metrics, for_supervision=False):
 
@@ -99,7 +99,9 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         mode = "val" if self.opt.phase == "test" or self.for_metrics else "train"
         images = []
         path_img = os.path.join(self.opt.dataroot, mode, "images")
-        for item in sorted(os.listdir(path_img)):
+        file_list = os.listdir(path_img)
+        sorted_file_list = sorted(file_list, key=lambda x: int(re.search(r'\d+', x).group()))
+        for item in sorted_file_list:
             images.append(os.path.join(path_img, item))
         labels = []
         path_lab = os.path.join(self.opt.dataroot, mode, "labels")
