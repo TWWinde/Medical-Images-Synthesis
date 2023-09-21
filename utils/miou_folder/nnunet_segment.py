@@ -159,9 +159,13 @@ class nnUNetPredictor(object):
                                        num_parts: int = 1,
                                        save_probabilities: bool = False):
         if isinstance(list_of_lists_or_source_folder, str):
-            print(list_of_lists_or_source_folder)
-            list_of_lists_or_source_folder = create_lists_from_splitted_dataset_folder(list_of_lists_or_source_folder,
-                                                                                       self.dataset_json['file_ending'])
+            #list_of_lists_or_source_folder = create_lists_from_splitted_dataset_folder(list_of_lists_or_source_folder,
+                                                                          #self.dataset_json['file_ending'])
+            folder = list_of_lists_or_source_folder
+            list_of_lists_or_source_folder = []
+            for item in sorted(os.listdir(folder)):
+                path = os.path.join(folder, item)
+                list_of_lists_or_source_folder.append(path)
         print(f'There are {len(list_of_lists_or_source_folder)} cases in the source folder')
         list_of_lists_or_source_folder = list_of_lists_or_source_folder[part_id::num_parts]
         print(list_of_lists_or_source_folder)
