@@ -256,7 +256,7 @@ class nnUNetPredictor(object):
                                                                                  num_processes_preprocessing)
 
         return self.predict_from_data_iterator(data_iterator, save_probabilities, num_processes_segmentation_export)
-    
+
     def predict_from_data_iterator(self,
                                    data_iterator,
                                    save_probabilities: bool = False,
