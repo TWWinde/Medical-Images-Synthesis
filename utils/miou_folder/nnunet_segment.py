@@ -5,7 +5,6 @@ import traceback
 from copy import deepcopy
 from time import sleep
 from typing import Tuple, Union, List, Optional
-
 import cv2
 import numpy as np
 import torch
@@ -18,10 +17,8 @@ from torch import nn
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
 import sys
-
 sys.path.append("/no_backups/s1449/nnUNetFrame/nnUNet/nnunetv2")
 import os
-
 os.environ["PYTHONPATH"] = "/no_backups/s1449/nnUNetFrame/nnUNet:" + os.environ.get("PYTHONPATH", "")
 import nnunetv2
 from nnunetv2.configuration import default_num_processes
