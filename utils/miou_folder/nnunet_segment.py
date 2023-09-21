@@ -17,8 +17,8 @@ from torch import nn
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
 import sys
-sys.path.append("/no_backups/s1449/nnUNetFrame/nnUNet")
-from nnUNet import nnunetv2
+sys.path.append("/no_backups/s1449/nnUNetFrame/nnUNet/nnunetv2")
+import nnunetv2
 from nnunetv2.configuration import default_num_processes
 from nnunetv2.inference.data_iterators import PreprocessAdapterFromNpy, preprocessing_iterator_fromfiles, \
     preprocessing_iterator_fromnpy
