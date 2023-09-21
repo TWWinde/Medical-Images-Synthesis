@@ -30,9 +30,8 @@ class miou_pytorch():
         if not self.opt.no_EMA:
             netEMA.eval()
         with torch.no_grad():
+            n=1
             for i, data_i in enumerate(self.val_dataloader):
-                if i >10:
-                    break
                 image, label = models.preprocess_input(self.opt, data_i)
                 edges = model.module.compute_edges(image)
                 if self.opt.no_EMA:
@@ -40,6 +39,9 @@ class miou_pytorch():
                 else:
                     generated = netEMA(label,edges=edges)
                 image_saver(label, generated, data_i["name"])
+                n+=1
+                if n >100:
+                    break
             get_predicted_label(self.opt, current_iter)
             if self.opt.dataset_mode == "medicals" or self.opt.dataset_mode == "medicals_no_3d_noise":
                 pred_folder = os.path.join(self.opt.results_dir, self.opt.name, str(current_iter), 'segmentation')
