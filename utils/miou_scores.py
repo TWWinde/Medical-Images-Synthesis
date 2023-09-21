@@ -38,7 +38,6 @@ class miou_pytorch():
                     generated = netG(label,edges=edges)
                 else:
                     generated = netEMA(label,edges=edges)
-                print(data_i["name"])
                 image_saver(label, generated, data_i["name"])
                 n+=1
                 if n >100:
