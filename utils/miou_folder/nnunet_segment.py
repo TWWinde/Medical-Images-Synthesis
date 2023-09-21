@@ -515,8 +515,8 @@ from nnunetv2.paths import nnUNet_results, nnUNet_raw
 
 
 def get_predicted_label(opt, current_iteration):
-    path_save = os.path.join(opt.results_dir, opt.name, str(current_iteration), "segmentartion")
-    path_read = os.path.join(opt.results_dir, opt.name, str(current_iteration), "image")
+    path_save = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', opt.name, str(current_iteration), "segmentartion")
+    path_read = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', opt.name, str(current_iteration), "image")
     predictor = nnUNetPredictor(
         tile_step_size=0.5,
         use_gaussian=True,
