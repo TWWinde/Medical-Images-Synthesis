@@ -17,7 +17,7 @@ from torch import nn
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
 import sys
-
+sys.path.append("/no_backups/s1449/Medical-Images-Synthesis")
 import config
 
 sys.path.append("/no_backups/s1449/nnUNetFrame/nnUNet/nnunetv2")
@@ -570,7 +570,7 @@ class nnUNetPredictor(object):
                     # sometimes the stuff is too large for GPUs. In that case fall back to CPU
                     results_device = torch.device('cpu')
                     data = data.to(results_device)
-                    predicted_logits = torch.zeros((self.label_manager.num_segmentation_heads, *data.shape[1:]),
+                    pedicted_logits = torch.zeros((self.label_manager.num_segmentation_heads, *data.shape[1:]),
                                                    dtype=torch.half,
                                                    device=results_device)
                     n_predictions = torch.zeros(data.shape[1:], dtype=torch.half,
