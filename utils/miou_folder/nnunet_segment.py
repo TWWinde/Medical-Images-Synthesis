@@ -17,6 +17,9 @@ from torch import nn
 from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
 import sys
+
+import config
+
 sys.path.append("/no_backups/s1449/nnUNetFrame/nnUNet/nnunetv2")
 import os
 os.environ["PYTHONPATH"] = "/no_backups/s1449/nnUNetFrame/nnUNet:" + os.environ.get("PYTHONPATH", "")
@@ -624,7 +627,6 @@ def get_predicted_label(opt, current_iteration):
 
 import os
 
-
 def compute_iou(pred_mask, gt_mask):
     intersection = np.logical_and(pred_mask, gt_mask)
     union = np.logical_or(pred_mask, gt_mask)
@@ -652,3 +654,9 @@ def compute_miou(opt, pred_folder, gt_folder):
     return mIoU
 
 
+if __name__ =='__main__':
+    opt = config.read_arguments(train=True)
+    get_predicted_label(opt, 0)
+    pred_folder = os.path.join(opt.results_dir, opt.name, str(0), 'segmentation')
+    gt_folder = os.path.join(opt.results_dir, opt.name, str(0), 'label')
+    answer = compute_miou(opt, pred_folder, gt_folder)
