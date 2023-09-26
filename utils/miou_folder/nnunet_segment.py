@@ -618,8 +618,8 @@ def get_predicted_label(opt, current_iteration):
         use_folds=(0,),
         checkpoint_name='checkpoint_final.pth',
     )
-    predictor.predict_from_files(join(path_read),
-                                 join(path_save),
+    predictor.predict_from_files(path_read,
+                                 path_save,
                                  save_probabilities=False, overwrite=False,
                                  num_processes_preprocessing=2, num_processes_segmentation_export=2,
                                  folder_with_segs_from_prev_stage=None, num_parts=1, part_id=0)
