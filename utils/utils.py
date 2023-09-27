@@ -106,7 +106,6 @@ class results_saver_mid_training():
             im = tens_to_lab(label[i], self.num_cl)
             self.save_im(im, "label", name_label)
             im = tens_to_im(generated[i]) * 255
-            print(name_image)
             self.save_im(im, "image", name_image)
 
     def save_im(self, im, mode, name):
