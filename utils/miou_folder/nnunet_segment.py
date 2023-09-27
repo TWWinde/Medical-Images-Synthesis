@@ -621,7 +621,7 @@ def get_predicted_label():
     predictor.predict_from_files(path_read,
                                  path_save,
                                  save_probabilities=False, overwrite=False,
-                                 num_processes_preprocessing=2, num_processes_segmentation_export=2,
+                                 num_processes_preprocessing=1, num_processes_segmentation_export=1,
                                  folder_with_segs_from_prev_stage=None, num_parts=1, part_id=0)
 
 
@@ -634,7 +634,7 @@ def compute_iou(pred_mask, gt_mask):
     return iou
 
 
-def compute_miou( pred_folder, gt_folder):
+def compute_miou(pred_folder, gt_folder):
     pred_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
     gt_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
     num_classes = 37
@@ -655,8 +655,10 @@ def compute_miou( pred_folder, gt_folder):
 
 
 if __name__ =='__main__':
-    #opt = config.read_arguments(train=True)
+    from nnunetv2.paths import nnUNet_results, nnUNet_raw
+
     get_predicted_label()
     pred_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'segmentation')
-    gt_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'label')
+    gt_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'groundtruth')
     answer = compute_miou(pred_folder, gt_folder)
+    print('miou', answer)
