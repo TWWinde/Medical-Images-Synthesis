@@ -105,6 +105,7 @@ class results_saver_mid_training():
             self.save_im(im, "label", name[i])
             im = tens_to_im(generated[i]) * 255
             name_image = name[i].split('.')[0] + '_0000' + name[i].split('.')[1]
+            print(name_image)
             self.save_im(im, "image", name_image)
 
     def save_im(self, im, mode, name):
