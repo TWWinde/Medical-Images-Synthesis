@@ -91,11 +91,11 @@ class results_saver_mid_training():
         path = os.path.join(opt.results_dir, opt.name, current_iteration)
         self.path_label = os.path.join(path, "label")
         self.path_image = os.path.join(path, "image")
-        self.path_segmentartion = os.path.join(path, "segmentartion")
+        self.path_segmentation = os.path.join(path, "segmentation")
         self.path_to_save = {"label": self.path_label, "image": self.path_image}
         os.makedirs(self.path_label, exist_ok=True)
         os.makedirs(self.path_image, exist_ok=True)
-        os.makedirs(self.path_segmentartion, exist_ok=True)
+        os.makedirs(self.path_segmentation, exist_ok=True)
         self.num_cl = opt.label_nc + 2
 
     def __call__(self, label, generated, name):
