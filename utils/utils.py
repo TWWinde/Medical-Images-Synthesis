@@ -87,7 +87,7 @@ class results_saver():
 
 
 class results_saver_mid_training():
-    def __init__(self, opt,current_iteration):
+    def __init__(self, opt, current_iteration):
         path = os.path.join(opt.results_dir, opt.name, current_iteration)
         self.path_label = os.path.join(path, "label")
         self.path_image = os.path.join(path, "image")
@@ -104,7 +104,7 @@ class results_saver_mid_training():
             im = tens_to_lab(label[i], self.num_cl)
             self.save_im(im, "label", name[i])
             im = tens_to_im(generated[i]) * 255
-            self.save_im(im, "image", name[i])
+            self.save_im(im, "image", name[i]+'_0000')
 
     def save_im(self, im, mode, name):
         im = Image.fromarray(im.astype(np.uint8))

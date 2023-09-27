@@ -43,7 +43,7 @@ class miou_pytorch():
                 if n >100:
                     break
             if self.opt.dataset_mode == "medicals" or self.opt.dataset_mode == "medicals_no_3d_noise":
-                #get_predicted_label(self.opt, current_iter)
+                get_predicted_label(self.opt, current_iter)
                 pred_folder = os.path.join(self.opt.results_dir, self.opt.name, str(current_iter), 'segmentation')
                 gt_folder = os.path.join(self.opt.results_dir, self.opt.name, str(current_iter), 'label')
                 answer = compute_miou(self.opt, pred_folder, gt_folder)
@@ -51,7 +51,7 @@ class miou_pytorch():
         netG.train()
         if not self.opt.no_EMA:
             netEMA.train()
-        return 1#answer
+        return answer
 
 
     def update(self, model, cur_iter):
