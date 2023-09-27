@@ -600,9 +600,9 @@ class nnUNetPredictor(object):
 from nnunetv2.paths import nnUNet_results, nnUNet_raw
 
 
-def get_predicted_label(opt, current_iteration):
-    path_save = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', opt.name, str(current_iteration), "segmentation")
-    path_read = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', opt.name, str(current_iteration), "image")
+def get_predicted_label():
+    path_save = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', "segmentation")
+    path_read = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', "generated")
     predictor = nnUNetPredictor(
         tile_step_size=0.5,
         use_gaussian=True,
@@ -634,10 +634,10 @@ def compute_iou(pred_mask, gt_mask):
     return iou
 
 
-def compute_miou(opt, pred_folder, gt_folder):
+def compute_miou( pred_folder, gt_folder):
     pred_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
     gt_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
-    num_classes = opt.label_nc
+    num_classes = 37
     class_ious = np.zeros(num_classes)
     for class_idx in range(num_classes):
         ious = []
@@ -656,7 +656,7 @@ def compute_miou(opt, pred_folder, gt_folder):
 
 if __name__ =='__main__':
     #opt = config.read_arguments(train=True)
-    get_predicted_label(opt, 0)
-    pred_folder = os.path.join(opt.results_dir, opt.name, str(0), 'segmentation')
-    gt_folder = os.path.join(opt.results_dir, opt.name, str(0), 'label')
-    answer = compute_miou(opt, pred_folder, gt_folder)
+    get_predicted_label()
+    pred_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'segmentation')
+    gt_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'label')
+    answer = compute_miou(pred_folder, gt_folder)
