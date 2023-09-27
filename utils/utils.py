@@ -102,7 +102,7 @@ class results_saver_mid_training():
         assert len(label) == len(generated)
         for i in range(len(label)):
             name_label = name[i].split("/")[-1].replace('.jpg', '.png')
-            name_image = name_label.split(".")[0] + '_0000' + name_label.split(".")[-1]
+            name_image = name_label.split(".")[0] + '_0000.' + name_label.split(".")[-1]
             im = tens_to_lab(label[i], self.num_cl)
             self.save_im(im, "label", name_label)
             im = tens_to_im(generated[i]) * 255
