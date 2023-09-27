@@ -33,7 +33,6 @@ class miou_pytorch():
             n=1
             for i, data_i in enumerate(self.val_dataloader):
                 image, label = models.preprocess_input(self.opt, data_i)
-                data_i["name"] = data_i["name"].split('.')[0]+'_0000'+data_i["name"].split('.')[1]
                 edges = model.module.compute_edges(image)
                 if self.opt.no_EMA:
                     generated = netG(label,edges=edges)
