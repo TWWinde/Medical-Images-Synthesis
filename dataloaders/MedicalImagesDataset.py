@@ -105,7 +105,9 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
             images.append(os.path.join(path_img, item))
         labels = []
         path_lab = os.path.join(self.opt.dataroot, mode, "labels")
-        for item in sorted(os.listdir(path_lab)):
+        file_list = os.listdir(path_lab)
+        sorted_file_list = sorted(file_list, key=lambda x: int(re.search(r'\d+', x).group()))
+        for item in sorted_file_list:
             labels.append(os.path.join(path_lab, item))
         assert len(images) == len(labels), "different len of images and labels %s - %s" % (len(images), len(labels))
         # for i in range(len(images)):
