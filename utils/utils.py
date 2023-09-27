@@ -101,16 +101,17 @@ class results_saver_mid_training():
     def __call__(self, label, generated, name):
         assert len(label) == len(generated)
         for i in range(len(label)):
+            name_label = name[i].split("/")[-1].replace('.jpg', '.png')
+            name_image = name_label.split(".")[0] + '_0000' + name_label.split(".")[-1]
             im = tens_to_lab(label[i], self.num_cl)
-            self.save_im(im, "label", name[i])
+            self.save_im(im, "label", name_label)
             im = tens_to_im(generated[i]) * 255
-            name_image = name[i].split('.')[0] + '_0000' + name[i].split('.')[1]
-            print(name[i])
+            print(name_image)
             self.save_im(im, "image", name_image)
 
     def save_im(self, im, mode, name):
         im = Image.fromarray(im.astype(np.uint8))
-        im.save(os.path.join(self.path_to_save[mode], name.split("/")[-1]).replace('.jpg', '.png'))
+        im.save(os.path.join(self.path_to_save[mode], name))
 
 class timer():
     def __init__(self, opt):
