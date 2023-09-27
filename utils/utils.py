@@ -85,6 +85,35 @@ class results_saver():
         combined_image.save(os.path.join(self.path_combined, name.split("/")[-1]).replace('.jpg', '.png'))
 
 
+class results_saver_for_test():
+    def __init__(self, opt):
+        path = os.path.join(opt.results_dir, opt.name,'test')
+        self.path_label = os.path.join(path, "label")
+        self.path_generated = os.path.join(path, "generated")
+        self.path_groundtruth = os.path.join(path, "groundtruth")
+        self.path_segmentation = os.path.join(path, "segmentation")
+        self.path_to_save = {"label": self.path_label, "generated": self.path_generated, "groundtruth": self.path_groundtruth}
+        os.makedirs(self.path_label, exist_ok=True)
+        os.makedirs(self.path_generated, exist_ok=True)
+        os.makedirs(self.path_segmentation, exist_ok=True)
+        self.num_cl = opt.label_nc + 2
+
+    def __call__(self, label, generated, groundtruth, name):
+        assert len(label) == len(generated)
+        for i in range(len(label)):
+            name_label = name[i].split("/")[-1].replace('.jpg', '.png')
+            name_image = name_label.split(".")[0] + '_0000.' + name_label.split(".")[-1]
+            im = tens_to_lab(label[i], self.num_cl)
+            self.save_im(im, "label", name_label)
+            im = tens_to_im(generated[i]) * 255
+            self.save_im(im, "generated", name_image)
+            im = tens_to_im(groundtruth[i]) * 255
+            self.save_im(im, "groundtruth", name_image)
+
+    def save_im(self, im, mode, name):
+        im = Image.fromarray(im.astype(np.uint8))
+        im.save(os.path.join(self.path_to_save[mode], name))
+
 
 class results_saver_mid_training():
     def __init__(self, opt, current_iteration):
