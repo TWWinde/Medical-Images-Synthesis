@@ -18,7 +18,7 @@ from torch.nn.parallel import DistributedDataParallel
 from tqdm import tqdm
 import sys
 sys.path.append("/no_backups/s1449/Medical-Images-Synthesis")
-import config
+#import config
 
 sys.path.append("/no_backups/s1449/nnUNetFrame/nnUNet/nnunetv2")
 import os
@@ -655,7 +655,7 @@ def compute_miou(opt, pred_folder, gt_folder):
 
 
 if __name__ =='__main__':
-    opt = config.read_arguments(train=True)
+    #opt = config.read_arguments(train=True)
     get_predicted_label(opt, 0)
     pred_folder = os.path.join(opt.results_dir, opt.name, str(0), 'segmentation')
     gt_folder = os.path.join(opt.results_dir, opt.name, str(0), 'label')
