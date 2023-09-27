@@ -96,6 +96,7 @@ class results_saver_for_test():
         os.makedirs(self.path_label, exist_ok=True)
         os.makedirs(self.path_generated, exist_ok=True)
         os.makedirs(self.path_segmentation, exist_ok=True)
+        os.makedirs(self.path_groundtruth, exist_ok=True)
         self.num_cl = opt.label_nc + 2
 
     def __call__(self, label, generated, groundtruth, name):
