@@ -104,8 +104,9 @@ class results_saver_for_test():
         for i in range(len(label)):
             name_label = name[i].split("/")[-1].replace('.jpg', '.png')
             name_image = name_label.split(".")[0] + '_0000.' + name_label.split(".")[-1]
-            im = tens_to_lab(label[i], self.num_cl)
-            self.save_im(im, "label", name_label)
+            im = label[i]
+            cv2.imwrite(os.path.join(self.path_to_save['label'], name_label), im)
+            #self.save_im(im, "label", name_label)
             im = tens_to_im(generated[i]) * 255
             self.save_im(im, "generated", name_image)
             im = tens_to_im(groundtruth[i]) * 255

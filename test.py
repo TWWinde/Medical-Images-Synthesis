@@ -22,7 +22,8 @@ compute_fid_generation = False
 compute_miou_segmentation_network = False
 compute_metrics = False
 
-from models.generator import WaveletUpsample,InverseHaarTransform,HaarTransform,WaveletUpsample2
+from models.generator import WaveletUpsample, InverseHaarTransform, HaarTransform, WaveletUpsample2
+
 wavelet_upsample = WaveletUpsample()
 
 # from pytorch_wavelets import DWTForward, DWTInverse # (or import DWT, IDWT)
@@ -30,16 +31,16 @@ wavelet_upsample = WaveletUpsample()
 # ifm = DWTInverse(mode='zero', wave='db3')
 
 
-
-
 from utils.utils import tens_to_im
 import numpy as np
 from torch.autograd import Variable
+
 
 def fast_hist(pred, label, n):
     k = (label >= 0) & (label < n)
     return np.bincount(
         n * label[k].astype(int) + pred[k], minlength=n ** 2).reshape(n, n)
+
 
 def per_class_iu(hist):
     return np.diag(hist) / (hist.sum(1) + hist.sum(0) - np.diag(hist) + 1e-10)
@@ -62,38 +63,38 @@ def compute_miou(pred_folder, gt_folder):
     for class_idx in range(num_classes):
         ious = []
         for image_name in image_name_list:
-            #mask_img = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8)
-            #print(mask_img)
+            # mask_img = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8)
+            # print(mask_img)
             pred_mask = np.array(Image.open(os.path.join(pred_folder, image_name))).astype(np.uint8) == class_idx
-            #print('shape1',pred_mask.shape)
-            gt_mask = np.array(Image.open(os.path.join(gt_folder, image_name)).convert('L')).astype(np.uint8) == class_idx
-            #print('shape2',gt_mask.shape)
+            # print('shape1',pred_mask.shape)
+            gt_mask = np.array(Image.open(os.path.join(gt_folder, image_name)).convert('L')).astype(
+                np.uint8) == class_idx
+            # print('shape2',gt_mask.shape)
             iou = compute_iou(pred_mask, gt_mask)
             ious.append(iou)
-
 
         class_ious[class_idx] = np.mean(ious)
         print('Class idx', class_idx, 'ious', np.mean(ious))
     mIoU = np.mean(class_ious)
-    print('mIoU ', mIoU )
+    print('mIoU ', mIoU)
     return mIoU
+
 
 from collections import namedtuple
 
-
-#--- read options ---#
+# --- read options ---#
 opt = config.read_arguments(train=False)
 print(opt.phase)
 
-#--- create dataloader ---#
-_,_, dataloader_val = dataloaders.get_dataloaders(opt)
+# --- create dataloader ---#
+_, _, dataloader_val = dataloaders.get_dataloaders(opt)
 
-#--- create utils ---#
-#image_saver = utils.results_saver(opt)
+# --- create utils ---#
+# image_saver = utils.results_saver(opt)
 image_saver = utils.results_saver_for_test(opt)
-#--- create models ---#
+# --- create models ---#
 model = models.Unpaired_model(opt)
-#model = models.Unpaired_model_cycle(opt)
+# model = models.Unpaired_model_cycle(opt)
 model = models.put_on_multi_gpus(model, opt)
 utils.load_networks(opt, model)
 model.eval()
@@ -101,42 +102,38 @@ model.eval()
 mae = []
 mse = []
 
-
-
-if generate_images :
-    #--- iterate over validation set ---#
+if generate_images:
+    # --- iterate over validation set ---#
     for i, data_i in tqdm(enumerate(dataloader_val)):
-        groundtruth, label = models.preprocess_input(opt, data_i)
+        label = data_i['label'].long()
+        groundtruth, _ = models.preprocess_input(opt, data_i)
         generated = model(None, label, "generate", None).cpu().detach()
         image_saver(label, generated, groundtruth, data_i["name"])
 
+        # generated1 = model(None, label, "generate", None).cpu().detach()
+        # generated2 = model(None, label, "generate", None).cpu().detach()
+        # generated3 = model(None, label, "generate", None).cpu().detach()
+        # generated4 = model(None, label, "generate", None).cpu().detach()
+        # plt.imshow(tens_to_im(generated[0]))
+        # downsampled = torch.nn.functional.interpolate(generated,scale_factor = 0.5)
+        # plt.figure()
+        # downsampled_wavlet = HaarTransform(3,four_channels=False,levels=1)(downsampled)
+        # downsampled_wavlet = HaarTransform(in_channels=3,four_channels=False)(downsampled)
 
-
-
-        #generated1 = model(None, label, "generate", None).cpu().detach()
-        #generated2 = model(None, label, "generate", None).cpu().detach()
-        #generated3 = model(None, label, "generate", None).cpu().detach()
-        #generated4 = model(None, label, "generate", None).cpu().detach()
-        #plt.imshow(tens_to_im(generated[0]))
-        #downsampled = torch.nn.functional.interpolate(generated,scale_factor = 0.5)
-        #plt.figure()
-        #downsampled_wavlet = HaarTransform(3,four_channels=False,levels=1)(downsampled)
-        #downsampled_wavlet = HaarTransform(in_channels=3,four_channels=False)(downsampled)
-
-        #upsampled_wavelet = WaveletUpsample2()(downsampled_wavlet)
-        #plt.imshow(tens_to_im(downsampled_wavlet[0]))
-        #upsampled = InverseHaarTransform(3,four_channels=False,levels=2)(upsampled_wavelet)
+        # upsampled_wavelet = WaveletUpsample2()(downsampled_wavlet)
+        # plt.imshow(tens_to_im(downsampled_wavlet[0]))
+        # upsampled = InverseHaarTransform(3,four_channels=False,levels=2)(upsampled_wavelet)
         # error = tens_to_im(upsampled[0]-generated[0])-0.5
-        #error = tens_to_im(torch.nn.functional.interpolate(torch.nn.functional.interpolate(generated[0],scale_factor = 0.5),scale_factor = 2)-generated[0])-0.5
-        #mae.append(np.absolute(error).mean())
-        #mse.append(np.sqrt(np.multiply(error,error).mean()))
-        #plt.figure()
-        #plt.imshow(tens_to_im(upsampled[0]-generated[0]))
-        #plt.show()
-        #image_saver(label, generated1, generated2, generated3, generated4, groundtruth, data_i["name"])
+        # error = tens_to_im(torch.nn.functional.interpolate(torch.nn.functional.interpolate(generated[0],scale_factor = 0.5),scale_factor = 2)-generated[0])-0.5
+        # mae.append(np.absolute(error).mean())
+        # mse.append(np.sqrt(np.multiply(error,error).mean()))
+        # plt.figure()
+        # plt.imshow(tens_to_im(upsampled[0]-generated[0]))
+        # plt.show()
+        # image_saver(label, generated1, generated2, generated3, generated4, groundtruth, data_i["name"])
 
-#print(np.array(mae).mean())
-#print(np.array(mse).mean())
+# print(np.array(mae).mean())
+# print(np.array(mse).mean())
 
 if compute_miou:
     pred_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'segmentation')
@@ -144,66 +141,59 @@ if compute_miou:
     answer = compute_miou(pred_folder, gt_folder)
     print('miou', answer)
 
-
-
 '''print(drn_105_d_miou(opt.results_dir,opt.name,'latest'))
 print(drn_105_d_miou(opt.results_dir,opt.name,'20000'))
 print(drn_105_d_miou(opt.results_dir,opt.name,'40000'))
 print(drn_105_d_miou(opt.results_dir,opt.name,'60000'))'''
 
-
-if compute_miou_generation :
-    print(drn_105_d_miou(opt.results_dir,opt.name,opt.ckpt_iter))
-else :
-    np_file = np.load(os.path.join(opt.checkpoints_dir,opt.name,'MIOU',"miou_log.npy"))
+if compute_miou_generation:
+    print(drn_105_d_miou(opt.results_dir, opt.name, opt.ckpt_iter))
+else:
+    np_file = np.load(os.path.join(opt.checkpoints_dir, opt.name, 'MIOU', "miou_log.npy"))
     first = list(np_file[0, :])
     sercon_miou = list(np_file[1, :])
-    #first.append(epoch)
-    #sercon.append(cur_fid)
+    # first.append(epoch)
+    # sercon.append(cur_fid)
     np_file = [first, sercon_miou]
     print('max miou score is :')
-    if opt.ckpt_iter == 'latest' :
+    if opt.ckpt_iter == 'latest':
         print(sercon_miou[-1])
-    elif opt.ckpt_iter == 'best' :
+    elif opt.ckpt_iter == 'best':
         print(np.max(sercon_miou))
-    else :
+    else:
         print(sercon_miou[first.index(float(opt.ckpt_iter))])
 
-if compute_fid_generation :
+if compute_fid_generation:
     fid_computer = fid_pytorch(opt, dataloader_val)
     fid_computer.fid_test(model)
-else :
-    np_file = np.load(os.path.join(opt.checkpoints_dir,opt.name,'FID',"fid_log.npy"))
+else:
+    np_file = np.load(os.path.join(opt.checkpoints_dir, opt.name, 'FID', "fid_log.npy"))
     first = list(np_file[0, :])
     sercon = list(np_file[1, :])
-    #first.append(epoch)
-    #sercon.append(cur_fid)
+    # first.append(epoch)
+    # sercon.append(cur_fid)
     np_file = [first, sercon]
-    #print('fid score is :')
-    if opt.ckpt_iter == 'latest' :
+    # print('fid score is :')
+    if opt.ckpt_iter == 'latest':
         print(sercon[-1])
-    elif opt.ckpt_iter == 'best' :
-        print('min fid : ',np.min(sercon))
+    elif opt.ckpt_iter == 'best':
+        print('min fid : ', np.min(sercon))
         index = sercon.index(np.min(sercon))
-        #print(len(sercon))
-        #print(len(sercon_miou))
-        #print(index)
-        print('miou : ',sercon_miou[index])
+        # print(len(sercon))
+        # print(len(sercon_miou))
+        # print(index)
+        print('miou : ', sercon_miou[index])
 
-    else :
+    else:
         print(sercon[first.index(float(opt.ckpt_iter))])
 
-
-
-
-
-if compute_miou_segmentation_network :
+if compute_miou_segmentation_network:
     hist = np.zeros((35, 35))
     for i, data_i in tqdm(enumerate(dataloader_val)):
         image, label = models.preprocess_input(opt, data_i)
         generated_image = model(image, label, "generate", None)
-        #plt.imshow(generated_plot)
-        #plt.figure()
+        # plt.imshow(generated_plot)
+        # plt.figure()
         generated = model(image, label, "segment_real", None)
         """generated_entropy = generated[0].cpu()-1
         pixel_entropy = torch.zeros(generated_entropy.size()[1:])
@@ -216,7 +206,7 @@ if compute_miou_segmentation_network :
                 pixel_entropy[j,k] = Categorical(probs= generated_entropy[:,j,k]).entropy()
         #generated_plot = torch.argmax(generated, 1).cpu()
         plt.imshow(pixel_entropy)"""
-        generated_plot = torch.argmax(generated,1)[0].cpu()-1
+        generated_plot = torch.argmax(generated, 1)[0].cpu() - 1
         """original_label = torch.argmax(label,1)[0].cpu()
         error_plot = generated_plot != original_label"""
         '''    plt.figure()
@@ -232,21 +222,19 @@ if compute_miou_segmentation_network :
         plt.figure()
         plt.imshow(tens_to_im(generated.cpu()[0]))"""
 
-        hist += fast_hist(generated_plot.flatten().numpy(), torch.argmax(label,1).flatten().cpu().numpy(), 35)
+        hist += fast_hist(generated_plot.flatten().numpy(), torch.argmax(label, 1).flatten().cpu().numpy(), 35)
 
         ious = per_class_iu(hist)
         reduced_ius = np.zeros(19)
-        for j,iu in enumerate(ious):
-            for gt_label in labels :
-                if gt_label.id == j and gt_label.trainId != 255 :
+        for j, iu in enumerate(ious):
+            for gt_label in labels:
+                if gt_label.id == j and gt_label.trainId != 255:
                     reduced_ius[gt_label.trainId] = iu
 
         print('===> mAP {mAP:.3f}'.format(
-            mAP=round(np.nanmean(reduced_ius) * 100, 2)),end="\r")
+            mAP=round(np.nanmean(reduced_ius) * 100, 2)), end="\r")
 
-
-
-        if (i % 100) == 0 :
+        if (i % 100) == 0:
             plt.figure()
             plt.imshow(hist, cmap='hot')
             plt.show()
@@ -262,10 +250,3 @@ if compute_miou_segmentation_network :
     print(' '.join('{:.03f}'.format(i) for i in ious))
     print(round(np.nanmean(reduced_ius), 2))
     print(round(np.nanmean(ious), 2))
-
-
-
-
-
-
-
