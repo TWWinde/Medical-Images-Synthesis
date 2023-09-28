@@ -47,7 +47,6 @@ def per_class_iu(hist):
 def compute_iou(pred_mask, gt_mask):
     intersection = np.logical_and(pred_mask, gt_mask)
     union = np.logical_or(pred_mask, gt_mask)
-    print('intersection:',intersection,'union:',union)
     iou = np.sum(intersection) / np.sum(union)
     return iou
 
@@ -134,7 +133,7 @@ if generate_images :
 
 if compute_miou:
     pred_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'segmentation')
-    gt_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'groundtruth')
+    gt_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'label')
     answer = compute_miou(pred_folder, gt_folder)
     print('miou', answer)
 
