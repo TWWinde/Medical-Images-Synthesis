@@ -15,7 +15,7 @@ from torch.distributions import Categorical
 import os
 from utils.Metrics import metrics
 
-generate_images = False
+generate_images = True
 compute_miou = True
 compute_miou_generation = False
 compute_fid_generation = False
