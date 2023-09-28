@@ -105,10 +105,10 @@ mse = []
 if generate_images:
     # --- iterate over validation set ---#
     for i, data_i in tqdm(enumerate(dataloader_val)):
-        label = data_i['label'].long()
-        groundtruth, _ = models.preprocess_input(opt, data_i)
+        label_save = data_i['label'].long()
+        groundtruth, label = models.preprocess_input(opt, data_i)
         generated = model(None, label, "generate", None).cpu().detach()
-        image_saver(label, generated, groundtruth, data_i["name"])
+        image_saver(label_save, generated, groundtruth, data_i["name"])
 
         # generated1 = model(None, label, "generate", None).cpu().detach()
         # generated2 = model(None, label, "generate", None).cpu().detach()
