@@ -48,6 +48,8 @@ def per_class_iu(hist):
 def compute_iou(pred_mask, gt_mask):
     intersection = np.logical_and(pred_mask, gt_mask)
     union = np.logical_or(pred_mask, gt_mask)
+    if np.sun(union) == 0:
+        return 0.0
     iou = np.sum(intersection) / np.sum(union)
     return iou
 
@@ -60,8 +62,8 @@ def compute_miou(pred_folder, gt_folder):
     for class_idx in range(num_classes):
         ious = []
         for pred_file, gt_file in zip(pred_files, gt_files):
-            pred_img = np.array(Image.open(os.path.join(pred_folder, pred_file))).astype(np.uint8)
-            print(pred_img)
+            mask_img = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8)
+            print(mask_img)
             pred_mask = np.array(Image.open(os.path.join(pred_folder, pred_file))).astype(np.uint8) == class_idx
             #print('shape1',pred_mask.shape)
             gt_mask = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8) == class_idx
