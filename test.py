@@ -47,6 +47,7 @@ def per_class_iu(hist):
 def compute_iou(pred_mask, gt_mask):
     intersection = np.logical_and(pred_mask, gt_mask)
     union = np.logical_or(pred_mask, gt_mask)
+    print('intersection:',intersection,'union:',union)
     iou = np.sum(intersection) / np.sum(union)
     return iou
 
