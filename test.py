@@ -55,18 +55,18 @@ def compute_iou(pred_mask, gt_mask):
 
 
 def compute_miou(pred_folder, gt_folder):
-    pred_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
-    gt_files = [f for f in sorted(os.listdir(gt_folder)) if f.endswith(".png")]
+    image_name = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
+
     num_classes = 37
     class_ious = np.zeros(num_classes)
     for class_idx in range(num_classes):
         ious = []
-        for pred_file, gt_file in zip(pred_files, gt_files):
+        for pred_file, gt_file in image_name:
             #mask_img = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8)
             #print(mask_img)
-            pred_mask = np.array(Image.open(os.path.join(pred_folder, pred_file))).astype(np.uint8) == class_idx
+            pred_mask = np.array(Image.open(os.path.join(pred_folder, image_name))).astype(np.uint8) == class_idx
             #print('shape1',pred_mask.shape)
-            gt_mask = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8) == class_idx
+            gt_mask = np.array(Image.open(os.path.join(gt_folder, image_name)).convert('L')).astype(np.uint8) == class_idx
             #print('shape2',gt_mask.shape)
             iou = compute_iou(pred_mask, gt_mask)
             ious.append(iou)
