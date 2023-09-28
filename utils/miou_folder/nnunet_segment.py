@@ -636,7 +636,7 @@ def compute_iou(pred_mask, gt_mask):
 
 def compute_miou(pred_folder, gt_folder):
     pred_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
-    gt_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
+    gt_files = [f for f in sorted(os.listdir(gt_folder)) if f.endswith(".png")]
     num_classes = 37
     class_ious = np.zeros(num_classes)
     for class_idx in range(num_classes):
