@@ -60,9 +60,9 @@ def compute_miou(pred_folder, gt_folder):
     for class_idx in range(num_classes):
         ious = []
         for pred_file, gt_file in zip(pred_files, gt_files):
-            pred_mask = np.array(Image.open(os.path.join(pred_folder, pred_file))) == class_idx
+            pred_mask = np.array(Image.open(os.path.join(pred_folder, pred_file))).astype(np.uint8) == class_idx
             #print('shape1',pred_mask.shape)
-            gt_mask = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')) == class_idx
+            gt_mask = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8) == class_idx
             #print('shape2',gt_mask.shape)
             iou = compute_iou(pred_mask, gt_mask)
             ious.append(iou)
