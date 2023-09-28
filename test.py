@@ -13,7 +13,8 @@ from torch.distributions import Categorical
 import os
 from utils.Metrics import metrics
 
-generate_images = True
+generate_images = False
+compute_miou = True
 compute_miou_generation = False
 compute_fid_generation = False
 compute_miou_segmentation_network = False
@@ -41,6 +42,32 @@ def fast_hist(pred, label, n):
 def per_class_iu(hist):
     return np.diag(hist) / (hist.sum(1) + hist.sum(0) - np.diag(hist) + 1e-10)
 
+
+def compute_iou(pred_mask, gt_mask):
+    intersection = np.logical_and(pred_mask, gt_mask)
+    union = np.logical_or(pred_mask, gt_mask)
+    iou = np.sum(intersection) / np.sum(union)
+    return iou
+
+
+def compute_miou(pred_folder, gt_folder):
+    pred_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
+    gt_files = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
+    num_classes = 37
+    class_ious = np.zeros(num_classes)
+    for class_idx in range(num_classes):
+        ious = []
+        for pred_file, gt_file in zip(pred_files, gt_files):
+            pred_mask = np.array(cv2.imread(os.path.join(pred_folder, pred_file))) == class_idx
+            gt_mask = np.array(cv2.imread(os.path.join(gt_folder, gt_file))) == class_idx
+            iou = compute_iou(pred_mask, gt_mask)
+            ious.append(iou)
+
+        class_ious[class_idx] = np.mean(ious)
+
+    mIoU = np.mean(class_ious)
+
+    return mIoU
 
 from collections import namedtuple
 
@@ -101,6 +128,12 @@ if generate_images :
 
 #print(np.array(mae).mean())
 #print(np.array(mse).mean())
+
+if compute_miou:
+    pred_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'segmentation')
+    gt_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'groundtruth')
+    answer = compute_miou(pred_folder, gt_folder)
+    print('miou', answer)
 
 
 
