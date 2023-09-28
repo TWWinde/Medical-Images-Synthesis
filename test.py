@@ -1,4 +1,5 @@
 import cv2
+from PIL import Image
 from numpy import generic
 from torchvision.transforms import functional
 import models.models as models
@@ -59,9 +60,9 @@ def compute_miou(pred_folder, gt_folder):
     for class_idx in range(num_classes):
         ious = []
         for pred_file, gt_file in zip(pred_files, gt_files):
-            pred_mask = np.array(cv2.imread(os.path.join(pred_folder, pred_file))) == class_idx
+            pred_mask = np.array(Image.open(os.path.join(pred_folder, pred_file))) == class_idx
             print('shape1',pred_mask.shape)
-            gt_mask = np.array(cv2.imread(os.path.join(gt_folder, gt_file))) == class_idx
+            gt_mask = np.array(Image.open(os.path.join(gt_folder, gt_file))) == class_idx
             print('shape2',gt_mask.shape)
             iou = compute_iou(pred_mask, gt_mask)
             ious.append(iou)
