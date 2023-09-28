@@ -71,8 +71,9 @@ def compute_miou(pred_folder, gt_folder):
             # print('shape2',gt_mask.shape)
             iou = compute_iou(pred_mask, gt_mask)
             ious.append(iou)
-
-        class_ious[class_idx] = np.mean(ious)
+        nonzero_ious = ious[ious != 0]
+        average_nonzero = np.sum(nonzero_ious) / np.count_nonzero(ious)
+        class_ious[class_idx] = average_nonzero  # np.mean(ious)
         print('Class idx', class_idx, 'ious', np.mean(ious))
     mIoU = np.mean(class_ious)
     print('mIoU ', mIoU)
