@@ -106,8 +106,8 @@ if generate_images:
     # --- iterate over validation set ---#
     for i, data_i in tqdm(enumerate(dataloader_val)):
         label_save = data_i['label'].long()
-        label_save = np.array(label_save).astype(np.uint8)
-        print(type(label_save))
+        label_save = np.array(label_save).astype(np.uint8).squeeze(1)
+        #print(type(label_save))
         print(label_save.shape)
         groundtruth, label = models.preprocess_input(opt, data_i)
         generated = model(None, label, "generate", None).cpu().detach()
