@@ -15,7 +15,7 @@ from torch.distributions import Categorical
 import os
 from utils.Metrics import metrics
 
-generate_images = True
+generate_images = False
 compute_miou = True
 compute_miou_generation = False
 compute_fid_generation = False
@@ -67,8 +67,7 @@ def compute_miou(pred_folder, gt_folder):
             # print(mask_img)
             pred_mask = np.array(Image.open(os.path.join(pred_folder, image_name))).astype(np.uint8) == class_idx
             # print('shape1',pred_mask.shape)
-            gt_mask = np.array(Image.open(os.path.join(gt_folder, image_name)).convert('L')).astype(
-                np.uint8) == class_idx
+            gt_mask = np.array(Image.open(os.path.join(gt_folder, image_name))).astype(np.uint8) == class_idx
             # print('shape2',gt_mask.shape)
             iou = compute_iou(pred_mask, gt_mask)
             ious.append(iou)
@@ -107,8 +106,6 @@ if generate_images:
     for i, data_i in tqdm(enumerate(dataloader_val)):
         label_save = data_i['label'].long()
         label_save = np.array(label_save).astype(np.uint8).squeeze(1)
-        #print(type(label_save))
-        print(label_save.shape)
         groundtruth, label = models.preprocess_input(opt, data_i)
         generated = model(None, label, "generate", None).cpu().detach()
         image_saver(label_save, generated, groundtruth, data_i["name"])
