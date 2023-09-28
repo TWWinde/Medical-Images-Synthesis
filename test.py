@@ -64,10 +64,11 @@ def compute_miou(pred_folder, gt_folder):
             iou = compute_iou(pred_mask, gt_mask)
             ious.append(iou)
 
+
         class_ious[class_idx] = np.mean(ious)
-
+        print('Class idx', class_idx, 'ious', np.mean(ious))
     mIoU = np.mean(class_ious)
-
+    print('mIoU ', mIoU )
     return mIoU
 
 from collections import namedtuple

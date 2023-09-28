@@ -651,7 +651,7 @@ def compute_miou(pred_folder, gt_folder):
 
     mIoU = np.mean(class_ious)
 
-    return mIoU
+    return mIoU, class_ious
 
 
 if __name__ =='__main__':
