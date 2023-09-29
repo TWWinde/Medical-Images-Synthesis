@@ -102,8 +102,10 @@ mae = []
 mse = []
 
 if generate_images:
+    j=0
     # --- iterate over validation set ---#
     for i, data_i in tqdm(enumerate(dataloader_val)):
+        j+=1
         label_save = data_i['label'].long()
         label_save = np.array(label_save).astype(np.uint8).squeeze(1)
         groundtruth, label = models.preprocess_input(opt, data_i)
@@ -114,6 +116,8 @@ if generate_images:
         generated4 = model(None, label, "generate", None).cpu().detach()
         image_saver(label_save, generated1, groundtruth, data_i["name"])
         image_saver_combine(label, generated1, generated2, generated3, generated4, groundtruth, data_i["name"])
+        if j==200:
+            break
         # plt.imshow(tens_to_im(generated[0]))
         # downsampled = torch.nn.functional.interpolate(generated,scale_factor = 0.5)
         # plt.figure()
