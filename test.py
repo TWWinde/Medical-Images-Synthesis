@@ -148,7 +148,7 @@ if compare_miou:
     #print('miou of generated images ', answer)
     #answer = compute_miou(pred_folder_generated_real, gt_folder)
     #print('miou of real images ', answer)
-    answer = compute_miou(pred_folder_generated_real, pred_folder_generated)
+    answer = compute_miou(pred_folder_generated, pred_folder_generated_real)
     print('miou of real images and generated ', answer)
 
 '''print(drn_105_d_miou(opt.results_dir,opt.name,'latest'))
