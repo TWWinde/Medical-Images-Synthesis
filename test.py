@@ -15,8 +15,8 @@ from torch.distributions import Categorical
 import os
 from utils.Metrics import metrics
 
-generate_images = True
-compute_miou = True
+generate_images = False
+compare_miou = True
 compute_miou_generation = False
 compute_fid_generation = False
 compute_miou_segmentation_network = False
@@ -139,7 +139,7 @@ if generate_images:
 # print(np.array(mae).mean())
 # print(np.array(mse).mean())
 
-if compute_miou:
+if compare_miou:
     pred_folder_generated = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'segmentation')
     pred_folder_generated_real = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test',
                                          'segmentation_real')
