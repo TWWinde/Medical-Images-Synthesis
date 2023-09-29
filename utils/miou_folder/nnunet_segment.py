@@ -651,7 +651,6 @@ def compute_miou(pred_folder, gt_folder):
         class_ious[class_idx] = np.mean(nonzero_ious)
         print('Class idx', class_idx, 'ious', np.mean(ious))
     mIoU = np.mean(class_ious)
-    print('mIoU ', mIoU)
     return mIoU
 
 
