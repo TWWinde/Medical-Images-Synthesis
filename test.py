@@ -144,10 +144,12 @@ if compare_miou:
     pred_folder_generated_real = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test',
                                          'segmentation_real')
     gt_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'label')
-    answer = compute_miou(pred_folder_generated, gt_folder)
-    print('miou of generated images ', answer)
-    answer = compute_miou(pred_folder_generated_real, gt_folder)
-    print('miou of real images ', answer)
+    #answer = compute_miou(pred_folder_generated, gt_folder)
+    #print('miou of generated images ', answer)
+    #answer = compute_miou(pred_folder_generated_real, gt_folder)
+    #print('miou of real images ', answer)
+    answer = compute_miou(pred_folder_generated_real, pred_folder_generated)
+    print('miou of real images and generated ', answer)
 
 '''print(drn_105_d_miou(opt.results_dir,opt.name,'latest'))
 print(drn_105_d_miou(opt.results_dir,opt.name,'20000'))
