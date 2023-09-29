@@ -15,7 +15,7 @@ from torch.distributions import Categorical
 import os
 from utils.Metrics import metrics
 
-generate_images = False
+generate_images = True
 compute_miou = True
 compute_miou_generation = False
 compute_fid_generation = False
@@ -89,7 +89,7 @@ print(opt.phase)
 _, _, dataloader_val = dataloaders.get_dataloaders(opt)
 
 # --- create utils ---#
-# image_saver = utils.results_saver(opt)
+image_saver_combine = utils.results_saver(opt)
 image_saver = utils.results_saver_for_test(opt)
 # --- create models ---#
 model = models.Unpaired_model(opt)
@@ -107,13 +107,13 @@ if generate_images:
         label_save = data_i['label'].long()
         label_save = np.array(label_save).astype(np.uint8).squeeze(1)
         groundtruth, label = models.preprocess_input(opt, data_i)
-        generated = model(None, label, "generate", None).cpu().detach()
-        image_saver(label_save, generated, groundtruth, data_i["name"])
-
-        # generated1 = model(None, label, "generate", None).cpu().detach()
-        # generated2 = model(None, label, "generate", None).cpu().detach()
-        # generated3 = model(None, label, "generate", None).cpu().detach()
-        # generated4 = model(None, label, "generate", None).cpu().detach()
+        #generated = model(None, label, "generate", None).cpu().detach()
+        generated1 = model(None, label, "generate", None).cpu().detach()
+        generated2 = model(None, label, "generate", None).cpu().detach()
+        generated3 = model(None, label, "generate", None).cpu().detach()
+        generated4 = model(None, label, "generate", None).cpu().detach()
+        image_saver(label_save, generated1, groundtruth, data_i["name"])
+        image_saver_combine(label, generated1, generated2, generated3, generated4, groundtruth, data_i["name"])
         # plt.imshow(tens_to_im(generated[0]))
         # downsampled = torch.nn.functional.interpolate(generated,scale_factor = 0.5)
         # plt.figure()
@@ -130,7 +130,7 @@ if generate_images:
         # plt.figure()
         # plt.imshow(tens_to_im(upsampled[0]-generated[0]))
         # plt.show()
-        # image_saver(label, generated1, generated2, generated3, generated4, groundtruth, data_i["name"])
+
 
 # print(np.array(mae).mean())
 # print(np.array(mse).mean())
