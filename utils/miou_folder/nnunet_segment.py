@@ -904,22 +904,28 @@ def compute_iou(pred_mask, gt_mask):
     return iou
 
 
-def compute_miou(pred_folder, gt_folder):
-    image_name_list = [f for f in sorted(os.listdir(pred_folder)) if f.endswith(".png")]
-
+def compute_miou(folder1, folder2):
+    image_name_list1 = [f for f in sorted(os.listdir(folder1)) if f.endswith(".png")]
+    image_name_list2 = [f for f in sorted(os.listdir(folder2)) if f.endswith(".png")]
     num_classes = 37
     class_ious = np.zeros(num_classes)
+    image_name_list = image_name_list1 if len(image_name_list1) <= len(image_name_list2) else image_name_list2
     for class_idx in range(num_classes):
         ious = []
         for image_name in image_name_list:
-            pred_mask = np.array(Image.open(os.path.join(pred_folder, image_name))).astype(np.uint8) == class_idx
-            gt_mask = np.array(Image.open(os.path.join(gt_folder, image_name))).astype(np.uint8) == class_idx
-            iou = compute_iou(pred_mask, gt_mask)
+            # mask_img = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8)
+            # print(mask_img)
+            mask1 = np.array(Image.open(os.path.join(folder1, image_name))).astype(np.uint8) == class_idx
+            # print('shape1',pred_mask.shape)
+            mask2 = np.array(Image.open(os.path.join(folder1, image_name))).astype(np.uint8) == class_idx
+            # print('shape2',gt_mask.shape)
+            iou = compute_iou(mask1, mask2)
             ious.append(iou)
         nonzero_ious = ious[ious != 0]
         class_ious[class_idx] = np.mean(nonzero_ious)
         print('Class idx', class_idx, 'ious', np.mean(ious))
     mIoU = np.mean(class_ious)
+    print('mIoU ', mIoU)
     return mIoU
 
 
