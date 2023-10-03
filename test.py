@@ -68,7 +68,7 @@ def compute_miou(folder1, folder2):
             # print(mask_img)
             mask1 = np.array(Image.open(os.path.join(folder1, image_name))).astype(np.uint8) == class_idx
             # print('shape1',pred_mask.shape)
-            mask2 = np.array(Image.open(os.path.join(folder1, image_name))).astype(np.uint8) == class_idx
+            mask2 = np.array(Image.open(os.path.join(folder2, image_name))).astype(np.uint8) == class_idx
             # print('shape2',gt_mask.shape)
             iou = compute_iou(mask1, mask2)
             ious.append(iou)
