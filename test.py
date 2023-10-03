@@ -143,14 +143,14 @@ if generate_images:
 if compare_miou:
     pred_folder_generated = os.path.join('/no_backups/s1449/OASIS/results', 'medicals', 'test', 'label')
     pred_folder_generated_real = os.path.join('/no_backups/s1449/OASIS/results', 'medicals', 'test',
-                                         'segmentation_real')
+                                         'segmentation')
     gt_folder = os.path.join('/no_backups/s1449/OASIS/results', 'medicals', 'test', 'label')
     #answer = compute_miou(pred_folder_generated, gt_folder)
     #print('miou of generated images ', answer)
     #answer = compute_miou(pred_folder_generated_real, gt_folder)
     #print('miou of real images ', answer)
     answer = compute_miou(pred_folder_generated, pred_folder_generated_real)
-    print('miou of real images segmentation and gt label ', answer)
+    print('miou of fake images segmentation and gt label ', answer)
 
 '''print(drn_105_d_miou(opt.results_dir,opt.name,'latest'))
 print(drn_105_d_miou(opt.results_dir,opt.name,'20000'))
