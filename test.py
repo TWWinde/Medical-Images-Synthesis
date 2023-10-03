@@ -60,7 +60,7 @@ def compute_miou(folder1, folder2):
     image_name_list2 = [f for f in sorted(os.listdir(folder2)) if f.endswith(".png")]
     num_classes = 37
     class_ious = np.zeros(num_classes)
-    image_name_list = image_name_list1 if len(image_name_list1) <= len(image_name_list2) else image_name_list2
+    image_name_list = list(set(image_name_list1) & set(image_name_list2))
     for class_idx in range(num_classes):
         ious = []
         for image_name in image_name_list:
