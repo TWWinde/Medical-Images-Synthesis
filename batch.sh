@@ -19,7 +19,8 @@
 #echo $PYENV_ROOT
 #echo $PATH
 pyenv activate venv
-module load cuda/11.3
+module load cuda
+# module load cuda/11.3
 
 # Run your python code
 # For single GPU use this
