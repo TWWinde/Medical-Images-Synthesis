@@ -71,7 +71,7 @@ for epoch in range(start_epoch, opt.num_epochs):
             p_loss_G, p_losses_G_list = p_loss_G.mean(), [loss.mean() if loss is not None else None for loss in p_losses_G_list]
             p_loss_G.backward()
             optimizerG.step()
-        else :
+        else:
             p_loss_G, p_losses_G_list = torch.zeros((1)), [torch.zeros((1))]
 
 

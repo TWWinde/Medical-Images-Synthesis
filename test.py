@@ -14,13 +14,14 @@ import torch
 from torch.distributions import Categorical
 import os
 from utils.Metrics import metrics
-
+import nibabel as nib
 generate_images = False
-compare_miou = True
+compare_miou = False
 compute_miou_generation = False
 compute_fid_generation = False
 compute_miou_segmentation_network = False
 compute_metrics = False
+generate_niffti = True
 
 from models.generator import WaveletUpsample, InverseHaarTransform, HaarTransform, WaveletUpsample2
 
@@ -29,7 +30,6 @@ wavelet_upsample = WaveletUpsample()
 # from pytorch_wavelets import DWTForward, DWTInverse # (or import DWT, IDWT)
 # xfm = DWTForward(J=3, mode='zero', wave='db3')  # Accepts all wave types available to PyWavelets
 # ifm = DWTInverse(mode='zero', wave='db3')
-
 
 from utils.utils import tens_to_im
 import numpy as np
@@ -102,11 +102,42 @@ model.eval()
 mae = []
 mse = []
 
+if generate_niffti:
+    j=0
+    k=0
+    # --- iterate over validation set ---#
+    for i, data_i in tqdm(enumerate(dataloader_val)):
+
+        label_save = data_i['label'].long()
+        label_save = np.array(label_save).astype(np.uint8).squeeze(1)
+        groundtruth, label = models.preprocess_input(opt, data_i)
+        generated = model(None, label, "generate", None).cpu().detach()
+        for b in range(len(generated)):
+            j += 1
+            one_channel = np.mean(generated[b].numpy(), axis=0)
+            arr = one_channel * 1000
+            concatenated_array = np.concatenate(arr, axis=0)
+            if j == 304:
+                k += 1
+                nifti_image = nib.Nifti1Image(concatenated_array, affine=np.eye(4))
+                nib.save(nifti_image, f'output_{k}.nii')
+                empty_array = np.empty_like(concatenated_array)
+                concatenated_array = empty_array
+                j = 0
+        if k == 10:
+            break
+
+
+
+
+
 if generate_images:
     j=0
+    k=0
     # --- iterate over validation set ---#
     for i, data_i in tqdm(enumerate(dataloader_val)):
         j+=1
+        k+=1
         label_save = data_i['label'].long()
         label_save = np.array(label_save).astype(np.uint8).squeeze(1)
         groundtruth, label = models.preprocess_input(opt, data_i)
@@ -115,9 +146,15 @@ if generate_images:
         generated2 = model(None, label, "generate", None).cpu().detach()
         generated3 = model(None, label, "generate", None).cpu().detach()
         generated4 = model(None, label, "generate", None).cpu().detach()
+        arr = generated1.numpy()
+
         image_saver(label_save, generated1, groundtruth, data_i["name"])
+
         #image_saver_combine(label, generated1, generated2, generated3, generated4, groundtruth, data_i["name"])
-        if j==2000:
+        if k == 303:
+            pass
+
+        if j == 2000:
             break
         # plt.imshow(tens_to_im(generated[0]))
         # downsampled = torch.nn.functional.interpolate(generated,scale_factor = 0.5)

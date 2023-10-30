@@ -14,6 +14,7 @@ import torch
 import torchvision.transforms as transforms
 import pytorch_msssim
 from pytorch_msssim import ssim
+import lpips
 import torch
 from skimage.metrics import peak_signal_noise_ratio, mean_squared_error
 # --------------------------------------------------------------------------#
@@ -39,13 +40,16 @@ class metrics():
 
     def compute_metrics(self, netG, netEMA, model = None):
         pips, ssim, psnr, rmse  = [], [], [], []
-        pips_model = torchvision.models.vgg16(pretrained=True).features.eval()
-        pips_model = pips_model.cuda()
+        #pips_model = torchvision.models.vgg16(pretrained=True).features.eval()
+        #pips_model = pips_model.cuda()
+        loss_fn_alex = lpips.LPIPS(net='alex')
         netG.eval()
-        transform = transforms.Compose([transforms.Resize((224, 224)),
-                                        #transforms.ToTensor(),
-                                        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                                             std=[0.229, 0.224, 0.225])])
+        transform1 = transforms.Compose([
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # normalized to [0, 1]
+        ])
+        transform2 = transforms.Compose([
+            transforms.Normalize(mean=[0, 0, 0], std=[0.5, 0.5, 0.5])  # normalized to [-1, 1]
+        ])
         if not self.opt.no_EMA:
             netEMA.eval()
 
@@ -55,24 +59,27 @@ class metrics():
                 image, label = models.preprocess_input(self.opt, data_i)
                 edges = model.module.compute_edges(image)
                 if self.opt.no_EMA:
-                    generated = netG(label,edges=edges)
+                    generated = netG(label, edges=edges)
                 else:
-                    generated = netEMA(label,edges=edges)  # [2, 3, 256, 256]
-                generated = (generated + 1) / 2
+                    generated = netEMA(label, edges=edges)  # [2, 3, 256, 256] [-1,1]
+
                 # SSIM
-                ssim_value = pytorch_msssim.ssim(generated, image)
+                input1 = transform2(generated)
+                input2 = transform2(image)
+                ssim_value = pytorch_msssim.ssim(input1, input2)
                 ssim.append(ssim_value.mean().item())
-                #ssim += [ssim_value]
-                # PIPS
-                input1 = transform(generated)
-                input2 = transform(image)
-                feature1 = pips_model(input1)
-                feature2 = pips_model(input2)
-                pips_val = torch.cosine_similarity(feature1, feature2, dim=1)
-                pips.append(pips_val.mean().item())
+                ssim += [ssim_value]
+                # PIPS lpips
+                d = loss_fn_alex(input1, input2)
+                #feature1 = pips_model(input1)
+                #feature2 = pips_model(input2)
+                #pips_val = torch.cosine_similarity(feature1, feature2, dim=1)
+                pips.append(d.mean().item())
                 #pips += [pips_val.mean()]
                 # PSNR, RMSE
-                mse = torch.nn.functional.mse_loss(generated, image)
+                input1 = transform1(generated)
+                input2 = transform1(image)
+                mse = torch.nn.functional.mse_loss(input1, input2)
                 max_pixel_value = 1.0
                 psnr_value = 10 * torch.log10((max_pixel_value ** 2) / mse)
                 rmse_value = torch.sqrt(mse)
@@ -91,7 +98,6 @@ class metrics():
         avg_ssim = np.array(avg_ssim)
         avg_psnr = np.array(avg_psnr)
         avg_rmse = np.array(avg_rmse)
-
 
         return avg_pips, avg_ssim, avg_psnr, avg_rmse
 

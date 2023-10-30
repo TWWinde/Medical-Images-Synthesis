@@ -42,6 +42,7 @@ def remove_background(image):
     result_image = cv2.multiply(image, result_image*255)
 
     return result_image
+# transfer png labels and generated image to niffti
 
 
 class results_saver():
