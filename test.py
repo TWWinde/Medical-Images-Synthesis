@@ -120,7 +120,7 @@ if generate_niffti:
             if j == 304:
                 k += 1
                 nifti_image = nib.Nifti1Image(concatenated_array, affine=np.eye(4))
-                nib.save(nifti_image, f'output_{k}.nii')
+                nib.save(nifti_image, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/output_{k}.nii')
                 empty_array = np.empty_like(concatenated_array)
                 concatenated_array = empty_array
                 j = 0
