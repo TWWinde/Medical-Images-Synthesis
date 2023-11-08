@@ -125,6 +125,8 @@ if generate_niffti:
             if j == 304:
                 image_array = np.array(niffti)
                 label_array = np.array(label_niffti)
+                print(image_array.shape)
+                print(label_array.shape)
 
                 k += 1
                 nifti_image = nib.Nifti1Image(image_array, affine=np.eye(4))
