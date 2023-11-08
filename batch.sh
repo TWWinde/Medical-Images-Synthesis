@@ -11,7 +11,7 @@
 #SBATCH --gpus=1
 #SBATCH --qos=batch
 # SBATCH --nodes=1
-#SBATCH --gpus=rtx_a5000:1
+# SBATCH --gpus=rtx_a5000:1
 # SBATCH --gpus=geforce_rtx_2080ti:1
 # SBATCH --gpus=geforce_gtx_titan_x:1
 
@@ -40,4 +40,4 @@ module load cuda
 #--num_epochs 500
 
 CUDA_VISIBLE_DEVICES=0 python test.py --name medicals --dataset_mode medicals --gpu_ids 0 \
---dataroot /misc/data/private/autoPET/data_nnunet --batch_size 20 --model_supervision 0  
+--dataroot /misc/data/private/autoPET/data_nnunet --batch_size 20 --model_supervision 0
