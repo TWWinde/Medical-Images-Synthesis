@@ -117,7 +117,7 @@ if generate_niffti:
 
         for b in range(len(generated)):
             j += 1
-            print(generated[b].shape)
+            # print(generated[b].shape) [3, 256, 256]
             one_channel = np.mean(generated[b].numpy(), axis=0)  # rgb to grey
             arr = one_channel * 1000
             label_niffti.append(label_save[b])
@@ -128,9 +128,9 @@ if generate_niffti:
 
                 k += 1
                 nifti_image = nib.Nifti1Image(image_array, affine=np.eye(4))
-                nib.save(nifti_image, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/image_output_{k}.nii')
+                nib.save(nifti_image, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/image_output_{k}.nii.gz')
                 nifti_label = nib.Nifti1Image(label_array, affine=np.eye(4))
-                nib.save(nifti_label, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/label_output_{k}.nii')
+                nib.save(nifti_label, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/label_output_{k}.nii.gz')
                 niffti = []
                 label_niffti = []
                 j = 0
