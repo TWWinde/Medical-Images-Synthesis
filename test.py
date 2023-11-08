@@ -107,6 +107,7 @@ if generate_niffti:
     k=0
     # --- iterate over validation set ---#
     niffti = []
+    label_niffti = []
     for i, data_i in tqdm(enumerate(dataloader_val)):
 
         label_save = data_i['label'].long()
@@ -117,17 +118,21 @@ if generate_niffti:
         for b in range(len(generated)):
             j += 1
             print(generated[b].shape)
-            one_channel = np.mean(generated[b].numpy(), axis=0)
+            one_channel = np.mean(generated[b].numpy(), axis=0)  # rgb to grey
             arr = one_channel * 1000
+            label_niffti.append(label_save[b])
             niffti.append(arr)
             if j == 304:
-                concatenated_array = np.array(niffti)
-                niffti = []
+                image_array = np.array(niffti)
+                label_array = np.array(label_niffti)
+
                 k += 1
-                nifti_image = nib.Nifti1Image(concatenated_array, affine=np.eye(4))
-                nib.save(nifti_image, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/output_{k}.nii')
-                empty_array = np.empty_like(concatenated_array)
-                concatenated_array = empty_array
+                nifti_image = nib.Nifti1Image(image_array, affine=np.eye(4))
+                nib.save(nifti_image, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/image_output_{k}.nii')
+                nifti_label = nib.Nifti1Image(label_array, affine=np.eye(4))
+                nib.save(nifti_label, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/label_output_{k}.nii')
+                niffti = []
+                label_niffti = []
                 j = 0
         if k == 10:
             break
