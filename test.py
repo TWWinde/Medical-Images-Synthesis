@@ -106,18 +106,23 @@ if generate_niffti:
     j=0
     k=0
     # --- iterate over validation set ---#
+    niffti = []
     for i, data_i in tqdm(enumerate(dataloader_val)):
 
         label_save = data_i['label'].long()
         label_save = np.array(label_save).astype(np.uint8).squeeze(1)
         groundtruth, label = models.preprocess_input(opt, data_i)
         generated = model(None, label, "generate", None).cpu().detach()
+
         for b in range(len(generated)):
             j += 1
+            print(generated[b].shape)
             one_channel = np.mean(generated[b].numpy(), axis=0)
             arr = one_channel * 1000
-            concatenated_array = np.concatenate(arr, axis=0)
+            niffti.append(arr)
             if j == 304:
+                concatenated_array = np.array(niffti)
+                niffti = []
                 k += 1
                 nifti_image = nib.Nifti1Image(concatenated_array, affine=np.eye(4))
                 nib.save(nifti_image, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/output_{k}.nii')
