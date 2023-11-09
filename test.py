@@ -119,7 +119,7 @@ if generate_niffti:
         for b in range(len(generated)):
             j += 1
             name = name_[b]
-            name_label = name[b].split("/")[-1]
+            name_label = name[b].split("/")[-2]
             name_label_ = name[b+1].split("/")[-1]
             per = int(name_label.split('_')[1])
             per_ = int(name_label_.split('_')[1])
