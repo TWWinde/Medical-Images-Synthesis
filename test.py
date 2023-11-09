@@ -119,9 +119,11 @@ if generate_niffti:
         for b in range(len(generated)):
             j += 1
             name = name_[b]
-            per = int(name_[b].split('_')[2])
-            per_ = int(name_[b+1].split('_')[2])
-            num = name_[b].split('_')[3]
+            name_label = name[b].split("/")[-1]
+            name_label_ = name[b+1].split("/")[-1]
+            per = int(name_label.split('_')[1])
+            per_ = int(name_label_.split('_')[1])
+            num = int(name_label_.split('_')[2].split('.')[0])
             # print(generated[b].shape) [3, 256, 256]
             one_channel = np.mean(generated[b].numpy(), axis=0)  # rgb to grey
             arr = one_channel * 1000
