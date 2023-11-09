@@ -114,20 +114,24 @@ if generate_niffti:
         label_save = np.array(label_save).astype(np.uint8).squeeze(1)
         groundtruth, label = models.preprocess_input(opt, data_i)
         generated = model(None, label, "generate", None).cpu().detach()
+        name_ = data_i["name"]
 
         for b in range(len(generated)):
             j += 1
+            name = name_[b]
+            per = int(name_[b].split('_')[1])
+            per_ = int(name_[b+1].split('_')[1])
+            num = name_[b].split('_')[2]
             # print(generated[b].shape) [3, 256, 256]
             one_channel = np.mean(generated[b].numpy(), axis=0)  # rgb to grey
             arr = one_channel * 1000
             label_niffti.append(label_save[b])
             niffti.append(arr)
-            if j == 304:
+            if per_ == per + 1:
                 image_array = np.array(niffti)
                 label_array = np.array(label_niffti)
                 print(image_array.shape)
                 print(label_array.shape)
-
                 k += 1
                 nifti_image = nib.Nifti1Image(image_array, affine=np.eye(4))
                 nib.save(nifti_image, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/test/image_output_{k}.nii.gz')

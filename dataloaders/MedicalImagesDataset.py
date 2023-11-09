@@ -100,18 +100,23 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
     def list_images(self):
         mode = "val" if self.opt.phase == "test" or self.for_metrics else "train"
         images = []
-        path_img = os.path.join(self.opt.dataroot, mode, "images")
-        file_list = os.listdir(path_img)
-        sorted_file_list = sorted(file_list, key=lambda x: int(re.search(r'\d+', x).group()))
-        for item in sorted_file_list:
-            images.append(os.path.join(path_img, item))
         labels = []
+        path_img = os.path.join(self.opt.dataroot, mode, "images")
+        file_list_image = os.listdir(path_img)
         path_lab = os.path.join(self.opt.dataroot, mode, "labels")
-        file_list = os.listdir(path_lab)
-        sorted_file_list = sorted(file_list, key=lambda x: int(re.search(r'\d+', x).group()))
-        for item in sorted_file_list:
+        file_list_label = os.listdir(path_lab)
+        if mode == 'test':
+            sorted_file_list_image = sorted(file_list_image, key=lambda x: (int(re.search(r'\d+', x).group(1)), int(re.search(r'\d+', x).group(2))))
+            sorted_file_list_label = sorted(file_list_label, key=lambda x: (int(re.search(r'\d+', x).group(1)), int(re.search(r'\d+', x).group(2))))
+        else:
+            sorted_file_list_image = sorted(file_list_image, key=lambda x: int(re.search(r'\d+', x).group()))
+            sorted_file_list_label = sorted(file_list_label, key=lambda x: int(re.search(r'\d+', x).group()))
+        for item in sorted_file_list_image:
+            images.append(os.path.join(path_img, item))
+        for item in sorted_file_list_label:
             labels.append(os.path.join(path_lab, item))
         assert len(images) == len(labels), "different len of images and labels %s - %s" % (len(images), len(labels))
+
         # for i in range(len(images)):
         #     assert images[i] == labels[i], \
         #         '%s and %s are not matching' % (images[i], labels[i])
