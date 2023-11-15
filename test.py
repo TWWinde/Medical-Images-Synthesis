@@ -120,12 +120,12 @@ if generate_niffti:
             j += 1
             name = name_[b]
             print(name)
-            name_label = name[b].split("/")[-1]
+            name_label = name[b].split('slice_')[-1]
             print(name_label)
-            name_label_ = name[b-1].split("/")[-1]
-            per = int(name_label.split('_')[1])
-            per_ = int(name_label_.split('_')[1])
-            num = int(name_label_.split('_')[2].split('.')[0])
+            name_label_ = name[b-1].split('slice_')[-1]
+            per = int(name_label.split('_')[0])
+            per_ = int(name_label_.split('_')[0])
+            num = int(name_label_.split('_')[1].split('.')[0])
             # print(generated[b].shape) [3, 256, 256]
             if per_ == per:
                 one_channel = np.mean(generated[b].numpy(), axis=0)  # rgb to grey
