@@ -119,9 +119,9 @@ if generate_niffti:
         for b in range(1, len(generated)):
             j += 1
             name = name_[b]
-            print(name)
+            # print(name)
             name_label = name_[b].split('/')[-1]
-            print(name_label)
+            # print(name_label)
             name_label_ = name_[b-1].split('/')[-1]
             per = int(name_label.split('_')[1])
             per_ = int(name_label_.split('_')[1])
@@ -129,9 +129,9 @@ if generate_niffti:
             # print(generated[b].shape) [3, 256, 256]
             if per_ == per:
                 one_channel = np.mean(generated[b].numpy(), axis=0)  # rgb to grey
-                arr = one_channel * 1000
+                #one_channel = one_channel * 1000
                 label_niffti.append(label_save[b])
-                niffti.append(arr)
+                niffti.append(one_channel)
             else:
                 image_array = np.array(niffti)
                 label_array = np.array(label_niffti)
