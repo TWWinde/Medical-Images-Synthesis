@@ -98,7 +98,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
             return {"image": image, "label": label, "name": self.images[self.mixed_index[idx]]}
 
     def list_images(self):
-        mode = "val" if self.opt.phase == "test" or self.for_metrics else "train"
+        mode = "test" if self.opt.phase == "test" or self.for_metrics else "train" #####val
         images = []
         labels = []
         path_img = os.path.join(self.opt.dataroot, mode, "images")
