@@ -121,6 +121,7 @@ if generate_niffti:
             name = name_[b]
             print(name)
             name_label = name[b].split("/")[-1]
+            print(name_label)
             name_label_ = name[b-1].split("/")[-1]
             per = int(name_label.split('_')[1])
             per_ = int(name_label_.split('_')[1])
