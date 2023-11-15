@@ -103,6 +103,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         labels = []
         path_img = os.path.join(self.opt.dataroot, mode, "images")
         file_list_image = os.listdir(path_img)
+        print(file_list_image[1])
         path_lab = os.path.join(self.opt.dataroot, mode, "labels")
         file_list_label = os.listdir(path_lab)
         if mode == 'test':
