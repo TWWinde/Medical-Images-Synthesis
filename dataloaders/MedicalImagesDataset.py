@@ -103,12 +103,12 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         labels = []
         path_img = os.path.join(self.opt.dataroot, mode, "images")
         file_list_image = os.listdir(path_img)
-        print(file_list_image[1])
+        # print(file_list_image[1]) slice_25_181.png
         path_lab = os.path.join(self.opt.dataroot, mode, "labels")
         file_list_label = os.listdir(path_lab)
         if mode == 'test':
-            sorted_file_list_image = sorted(file_list_image, key=lambda x: (int(re.search(r'\d+', x).group(1)), int(re.search(r'\d+', x).group(2))))
-            sorted_file_list_label = sorted(file_list_label, key=lambda x: (int(re.search(r'\d+', x).group(1)), int(re.search(r'\d+', x).group(2))))
+            sorted_file_list_image = sorted(file_list_image, key=lambda x: (int(x.split('_')[1]), int(x.split('_')[-1].split('.')[0])))
+            sorted_file_list_label = sorted(file_list_label, key=lambda x: (int(x.split('_')[1]), int(x.split('_')[-1].split('.')[0])))
         else:
             sorted_file_list_image = sorted(file_list_image, key=lambda x: int(re.search(r'\d+', x).group()))
             sorted_file_list_label = sorted(file_list_label, key=lambda x: int(re.search(r'\d+', x).group()))
