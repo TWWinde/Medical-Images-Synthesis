@@ -142,7 +142,7 @@ if generate_niffti:
                 os.makedirs(f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/MOOSEv2_data/S{k}/', exist_ok=True)
                 nib.save(nifti_image, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/MOOSEv2_data/S{k}/CT_S{k}.nii.gz')
                 nifti_label = nib.Nifti1Image(label_array, affine=np.eye(4))
-                os.makedirs(f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/3d_label/label_S{k}.nii.gz', exist_ok=True)
+                os.makedirs(f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/3d_label/', exist_ok=True)
                 nib.save(nifti_label, f'/no_backups/s1449/Medical-Images-Synthesis/results/medicals/3d_label/label_S{k}.nii.gz')
                 niffti = []
                 label_niffti = []
