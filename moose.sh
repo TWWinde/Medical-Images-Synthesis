@@ -32,7 +32,12 @@ module load cuda
 #--netG 0 --channels_G 64 \
 #--num_epochs 500
 
-
+#CUDA_VISIBLE_DEVICES=0 python train.py --name medicals --dataset_mode medicals --gpu_ids 0 \
+#--dataroot /misc/data/private/autoPET/data_nnunet  \
+#--batch_size 4 --model_supervision 0 --add_mask \
+#--Du_patch_size 32 --netDu wavelet  \
+#--netG 0 --channels_G 64 \
+#--num_epochs 500
 
 CUDA_VISIBLE_DEVICES=0 python /misc/no_backups/s1449/Medical-Images-Synthesis/utils/miou_folder/moose_segment.py
 

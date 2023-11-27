@@ -1,11 +1,9 @@
 import os
-import shutil
-
 import cv2
 import nibabel as nib
-import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+
 
 def remove_background(image):
     # Apply Gaussian blur to the image (optional)
