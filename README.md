@@ -35,7 +35,7 @@ We implement our models based on [AutoPET](https://autopet.grand-challenge.org)(
 
 ## Input Pipeline
 For medical images, the pre-processing is of great importance.
-execute ```dataloaders/generate_2d_images.py```to transfer 3d niffti images to slices(2d labels and RGB images).
+Execute ```dataloaders/generate_2d_images.py```to transfer 3d niffti images to slices(2d labels and RGB images).
 implementing ```remove_background```function can remove the useless artifacts from medical equipment 
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/WechatIMG3102.png)
 The script above results in the following folder structure.
