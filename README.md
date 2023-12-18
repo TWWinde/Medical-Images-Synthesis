@@ -9,7 +9,7 @@ task is to translate the semantic maps from dataset A to images from dataset B. 
 exist in this task due to the scarcity of the labels, and the heterogeneity of the data (from different 
 patients and modalities).
 
-[[OpenReview](https://openreview.net/forum?id=yvQKLaqNE6M)]  [[Arxiv](https://arxiv.org/abs/2012.04781)]  
+
 
 # Overview
 
@@ -18,7 +18,7 @@ In addition, many different images can be generated from any given label map by 
 We implemented [Oasis](https://arxiv.org/abs/2012.04781)-generator, which is based on SPADE and Wavelet-discriminator. 
 This repo is supervised paired image synthesis, the first step towards our final goal, using CT labels to generate CT images.
 Our final model for unpaired image synthesis is still in progress and will be released soon!
-
+![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/ctvsmri.jpg)
 
 ## Setup
 First, clone this repository:
