@@ -105,7 +105,7 @@ If you use this work please cite
 ## Results
 
 The generated images of our model are shown below:
-![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/combined_generated1.png)
+![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/combined_geneated1.png)
 This is the first edition of the model. They are not rewarding as the shape of the generated images vary a lot, the shape consistency is not 
 good enough, especially at the boundary. So we use Mask Loss to enhance shape consistency. The basic idea is very straightforward and shown below.
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/maskloss.png)
