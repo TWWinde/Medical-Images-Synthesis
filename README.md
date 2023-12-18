@@ -107,7 +107,8 @@ If you use this work please cite
 ```
 ## Results
 
-The generated images of our model are shown below(first images are labels, last images are ground_truth, the images in between are generated images):
+The generated images of our model are shown below: 
+(first images are labels, last images are ground_truth, the images in between are generated images):
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/combined_gerneated1.png)
 This is the first edition of the model, which are not rewarding as the shape of the generated images vary a lot, the shape consistency is not 
 good enough, especially at the boundary. So we pre-process the input images to remove artifacts from medical equipment(as shown in input pipeline above)
