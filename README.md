@@ -62,7 +62,7 @@ You can also specify another folder for the checkpoints using the ```--checkpoin
 If you want to continue training, start the respective script with the ```--continue_train``` flag. 
 Have a look at ```config.py``` for other options you can specify.  
 Training on 1 NVIDIA A5000 (32GB) is recommended.
-![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/metrics.png)
+
 
 ## Testing the model
 
@@ -76,7 +76,7 @@ At the beginning of training, the inception moments of the real images are compu
 How frequently the FID should be evaluated is controlled via the parameter ```--freq_fid```, which is set to 5000 steps by default.
 The inception net that is used for FID computation automatically downloads a pre-trained inception net checkpoint. 
 If that automatic download fails, for instance because your server has restricted internet access, get the checkpoint named ```pt_inception-2015-12-05-6726825d.pth``` from [here](https://www.dropbox.com/sh/nf6of02pyk84zjg/AAC8hnnj0T_MAiPx3tzdAyiWa?dl=0) and place it in ```/utils/fid_folder/```. In this case, do not forget to replace ```load_state_dict_from_url``` function accordingly.
-![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/plot_fid.png)
+![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/metrics.png)
 
 ## Pretrained models
 
