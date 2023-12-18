@@ -10,8 +10,7 @@ exist in this task due to the scarcity of the labels, and the heterogeneity of t
 patients and modalities).
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/ctvsmri.png)
 
-
-# Overview
+## Overview
 
 This repository is about my master research project (Forschungsarbeit), which aims at generating realistic looking medical images from semantic label maps. 
 In addition, many different images can be generated from any given label map by simply resampling a noise vector.
