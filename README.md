@@ -12,7 +12,7 @@ patients and modalities).
 
 ## Overview
 
-This repository is about my master research project (Forschungsarbeit), which aims at generating realistic looking medical images from semantic label maps. 
+This repository is about part of my master research project (Forschungsarbeit), which aims at generating realistic looking medical images from semantic label maps. 
 In addition, many different images can be generated from any given label map by simply resampling a noise vector.
 We implemented [Oasis](https://arxiv.org/abs/2012.04781)-generator, which is based on SPADE and Wavelet-discriminator. 
 This repo is supervised paired image synthesis, the first step towards our final goal, using CT labels to generate CT images.
