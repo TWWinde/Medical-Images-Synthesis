@@ -34,7 +34,7 @@ source activate MIS
 ```
 ## Datasets
 
-We implement our models based on [AutoPET](https://autopet.grand-challenge.org)(for paired supervised model) and [SynthRAD2023](https://synthrad2023.grand-challenge.org)(for unpaired unsupervised model).
+We implement our models based on [AutoPET](https://autopet.grand-challenge.org), which is used for paired supervised model(this repo), and [SynthRAD2023](https://synthrad2023.grand-challenge.org), which is used for unpaired unsupervised model.
 
 ## Input Pipeline
 For medical images, the pre-processing is of great importance.
@@ -42,6 +42,7 @@ Execute ```dataloaders/generate_2d_images.py```to transfer 3d niffti images to s
 implementing ```remove_background```function can remove the useless artifacts from medical equipment 
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/WechatIMG3102.png)
 The script above results in the following folder structure.
+
 ```
 data_dir
 ├── train
