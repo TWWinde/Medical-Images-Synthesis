@@ -31,6 +31,8 @@ source activate MIS
 ## Datasets
 
 We implement our models based on [AutoPET](https://autopet.grand-challenge.org)(for paired supervised model) and [SynthRAD2023](https://synthrad2023.grand-challenge.org)(for unpaired unsupervised model).
+
+## Input Pipeline
 execute ```dataloaders/generate_2d_images.py```to transfer 3d niffti images to slices(2d labels and RGB images).
 The script above results in the following folder structure.
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/WechatIMG3102.png)
