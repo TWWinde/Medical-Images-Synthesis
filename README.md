@@ -1,42 +1,54 @@
-# You Only Need Adversarial Supervision for Semantic Image Synthesis
+# Unsupervised Semantic Image Synthesis for Medical Imaging
 
-Official PyTorch implementation of the ICLR 2021 paper "You Only Need Adversarial Supervision for Semantic Image Synthesis". The code allows the users to
-reproduce and extend the results reported in the study. Please cite the paper when reporting, reproducing or extending the results.
+
+Obtaining large labeled datasets in the medical field is often hard due to privacy concerns. A 
+promising solution is to generate synthetic labeled data with Generative Adversarial Networks. 
+Given a labeled dataset A containing images from one modality (e.g. CT scans) and their semantic 
+labels, and an unlabeled dataset B with unlabeled images from another modality (MRI scans), the 
+task is to translate the semantic maps from dataset A to images from dataset B. Several challenges 
+exist in this task due to the scarcity of the labels, and the heterogeneity of the data (from different 
+patients and modalities).
 
 [[OpenReview](https://openreview.net/forum?id=yvQKLaqNE6M)]  [[Arxiv](https://arxiv.org/abs/2012.04781)]  
 
 # Overview
 
-This repository implements the OASIS model, which generates realistic looking images from semantic label maps. In addition, many different images can be generated from any given label map by simply resampling a noise vector (first two rows of the figure below). The model also allows to just resample parts of the image (see the last two rows of the figure below). Check out the paper for details, as well as the appendix, which contains many additional examples.
-
-
-<p align="center">
-<img src="overview.png" >
-</p>
-
+This repository is about my master research project (Forschungsarbeit), which generates realistic looking medical images from semantic label maps. In addition, many different images can be generated from any given label map by simply resampling a noise vector.
 
 
 ## Setup
 First, clone this repository:
 ```
-git clone https://github.com/boschresearch/OASIS.git
-cd OASIS
+git clone https://github.com/TWWinde/Medical-Images-Synthesis.git
+cd Medical-Images-Synthesis
 ```
 
-The code is tested for Python 3.7.6 and the packages listed in [oasis.yml](oasis.yml).
 The basic requirements are PyTorch and Torchvision.
-The easiest way to get going is to install the oasis conda environment via1
 ```
-conda env create --file oasis.yml
-source activate oasis
+conda env create MIS
+source activate MIS
 ```
 ## Datasets
 
-For COCO-Stuff, Cityscapes or ADE20K, please follow the instructions for the dataset preparation as outlined in [https://github.com/NVlabs/SPADE](https://github.com/NVlabs/SPADE).
+We implement our models based on [AutoPET](https://autopet.grand-challenge.org)(for paired supervised model) and [SynthRAD2023](https://synthrad2023.grand-challenge.org)(for unpaired unsupervised model).
+execute ```dataloaders/generate_2d_images.py```to transfer 3d niffti images to slices(2d labels and RGB images).
+The script above results in the following folder structure.
+```
+data_dir
+├── train
+|     ├──images
+|     ├──labels                 
+├── test
+|     ├──images 
+|     ├──labels
+└── val
+      ├──images
+      ├──labels
+```
 
 ## Training the model
 
-To train the model, execute the training scripts in the ```scripts``` folder. In these scripts you first need to specify the path to the data folder. Via the ```--name``` parameter the experiment can be given a unique identifier. The experimental results are then saved in the folder ```./checkpoints```, where a new folder for each run is created with the specified experiment name. You can also specify another folder for the checkpoints using the ```--checkpoints_dir``` parameter.
+To train the model, execute the training scripts through ```sbatch batch.sh``` . In these scripts you first need to specify the path to the data folder. Via the ```--name``` parameter the experiment can be given a unique identifier. The experimental results are then saved in the folder ```./checkpoints```, where a new folder for each run is created with the specified experiment name. You can also specify another folder for the checkpoints using the ```--checkpoints_dir``` parameter.
 If you want to continue training, start the respective script with the ```--continue_train``` flag. Have a look at ```config.py``` for other options you can specify.  
 Training on 4 NVIDIA Tesla V100 (32GB) is recommended.
 

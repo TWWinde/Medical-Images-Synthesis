@@ -16,12 +16,11 @@ def remove_background(image):
         area = stats[label, cv2.CC_STAT_AREA]
         if area > 1000:
             result_image[labels == label] = 255
-            #result_image = morphology.binary_opening(result_image, )
-            #result_image = morphology.remove_small_holes(result_image,area_threshold=8)
     result_image = result_image.astype(np.uint8)
     result_image = cv2.multiply(image, result_image*255)
 
     return result_image
+
 
 def get_2d_images(ct_path, label_path):
     n = 0
