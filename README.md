@@ -14,6 +14,7 @@ patients and modalities).
 # Overview
 
 This repository is about my master research project (Forschungsarbeit), which generates realistic looking medical images from semantic label maps. In addition, many different images can be generated from any given label map by simply resampling a noise vector.
+We implemented [Oasis](https://arxiv.org/abs/2012.04781)-generator, which is based on SPADE and Wavelet-discriminator.
 
 
 ## Setup
@@ -33,20 +34,22 @@ source activate MIS
 We implement our models based on [AutoPET](https://autopet.grand-challenge.org)(for paired supervised model) and [SynthRAD2023](https://synthrad2023.grand-challenge.org)(for unpaired unsupervised model).
 
 ## Input Pipeline
+For medical images, the pre-processing is of great importance.
 execute ```dataloaders/generate_2d_images.py```to transfer 3d niffti images to slices(2d labels and RGB images).
-The script above results in the following folder structure.
+implementing ```remove_background```function can remove the useless artifacts from medical equipment 
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/WechatIMG3102.png)
+The script above results in the following folder structure.
 ```
 data_dir
 ├── train
 |     ├──images
-|     ├──labels                 
+|     └── labels                 
 ├── test
 |     ├──images 
-|     ├──labels
+|     └── labels
 └── val
       ├──images
-      ├──labels
+      └── labels
 ```
 
 ## Training the model
@@ -63,6 +66,7 @@ To test a trained model, execute the testing scripts in the ```scripts``` folder
 ## Measuring FID
 
 The FID is computed on the fly during training, using the popular PyTorch FID implementation from https://github.com/mseitzer/pytorch-fid. At the beginning of training, the inception moments of the real images are computed before the actual training loop starts. How frequently the FID should be evaluated is controlled via the parameter ```--freq_fid```, which is set to 5000 steps by default. The inception net that is used for FID computation automatically downloads a pre-trained inception net checkpoint. If that automatic download fails, for instance because your server has restricted internet access, get the checkpoint named ```pt_inception-2015-12-05-6726825d.pth``` from [here](https://www.dropbox.com/sh/nf6of02pyk84zjg/AAC8hnnj0T_MAiPx3tzdAyiWa?dl=0) and place it in ```/utils/fid_folder/```. In this case, do not forget to replace ```load_state_dict_from_url``` function accordingly.
+![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/plot_fid.png)
 
 ## Pretrained models
 
