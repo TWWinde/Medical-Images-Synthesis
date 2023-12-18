@@ -69,7 +69,10 @@ Training on 1 NVIDIA A5000 (32GB) is recommended.
 
 ## Testing the model
 
-To test a trained model, execute the testing scripts in the ```scripts``` folder. The ```--name``` parameter should correspond to the experiment name that you want to test, and the ```--checkpoints_dir``` should the folder where the experiment is saved (default: ```./checkpoints```). These scripts will generate images from a pretrained model in ```./results/name/```.
+To test a trained model, execute the testing scripts in the ```scripts``` folder. The ```--name``` parameter 
+should correspond to the experiment name that you want to test, and the ```--checkpoints_dir``` should the folder 
+where the experiment is saved (default: ```./checkpoints```). These scripts will generate images from a pretrained model 
+in ```./results/name/```.
 
 
 ## Measuring Metrics
@@ -81,13 +84,17 @@ The inception net that is used for FID computation automatically downloads a pre
 The Alex net that is used for PIPs computation automatically downloads a pre-trained Alex net checkpoint. 
 The results are ploted automatically and shown below.
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/metrics.png)
+In oder to compute MIoU, we use the powerful segmentation benchmark--nnUnet. We trained on AutoPET 2d slices and our validation Dice reached 0.78.
+The checkpoints for the pre-trained segmentation model is available [here](). For the major classed, the MIoU are more the 0.7. The code of nnUnet id loacted
+in my another [repo](https://github.com/TWWinde/nnUNet). After configuration, you can simply execute ```utils/miou_folder/nnunet_segment.py```
+to compute the MIoU.
 
 ## Pretrained models
 
 The checkpoints for the pre-trained models are available [here]() as zip files. Copy them into the checkpoints folder (the default is ```./checkpoints```, 
 create it if it doesn't yet exist) and unzip them. The folder structure should be  
 
-You can generate images with a pre-trained checkpoint via ```test.py```. Using the example of ADE20K:
+You can generate images with a pre-trained checkpoint via ```test.py```:
 ```
 python test.py --dataset_mode medical --name medical_pretrained \
 --dataroot path_to/autopet
