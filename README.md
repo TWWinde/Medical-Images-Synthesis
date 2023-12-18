@@ -69,23 +69,25 @@ Training on 1 NVIDIA A5000 (32GB) is recommended.
 To test a trained model, execute the testing scripts in the ```scripts``` folder. The ```--name``` parameter should correspond to the experiment name that you want to test, and the ```--checkpoints_dir``` should the folder where the experiment is saved (default: ```./checkpoints```). These scripts will generate images from a pretrained model in ```./results/name/```.
 
 
-## Measuring FID
+## Measuring Metrics
 
-The FID is computed on the fly during training, using the popular PyTorch FID implementation from https://github.com/mseitzer/pytorch-fid. 
+The FID, PIPS, PSNR, RMSE and SSIM are computed on the fly during training, using the popular PyTorch implementation from https://github.com/mseitzer/pytorch-fid. 
 At the beginning of training, the inception moments of the real images are computed before the actual training loop starts. 
 How frequently the FID should be evaluated is controlled via the parameter ```--freq_fid```, which is set to 5000 steps by default.
 The inception net that is used for FID computation automatically downloads a pre-trained inception net checkpoint. 
-If that automatic download fails, for instance because your server has restricted internet access, get the checkpoint named ```pt_inception-2015-12-05-6726825d.pth``` from [here](https://www.dropbox.com/sh/nf6of02pyk84zjg/AAC8hnnj0T_MAiPx3tzdAyiWa?dl=0) and place it in ```/utils/fid_folder/```. In this case, do not forget to replace ```load_state_dict_from_url``` function accordingly.
+The Alex net that is used for PIPs computation automatically downloads a pre-trained Alex net checkpoint. 
+The results are ploted automatically and shown below.
 ![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/metrics.png)
 
 ## Pretrained models
 
-The checkpoints for the pre-trained models are available [here](https://www.dropbox.com/sh/nf6of02pyk84zjg/AAC8hnnj0T_MAiPx3tzdAyiWa?dl=0) as zip files. Copy them into the checkpoints folder (the default is ```./checkpoints```, create it if it doesn't yet exist) and unzip them. The folder structure should be  
+The checkpoints for the pre-trained models are available [here]() as zip files. Copy them into the checkpoints folder (the default is ```./checkpoints```, 
+create it if it doesn't yet exist) and unzip them. The folder structure should be  
 
 You can generate images with a pre-trained checkpoint via ```test.py```. Using the example of ADE20K:
 ```
-python test.py --dataset_mode ade20k --name oasis_ade20k_pretrained \
---dataroot path_to/ADEChallenge2016
+python test.py --dataset_mode medical --name medical_pretrained \
+--dataroot path_to/autopet
 ```
 This script will create a folder named ```./results``` in which the resulting images are saved.
 
@@ -93,13 +95,26 @@ If you want to continue training from this checkpoint, use ```train.py``` with t
 ## Citation
 If you use this work please cite
 ```
-@inproceedings{schonfeld_sushko_iclr2021,
-  title={You Only Need Adversarial Supervision for Semantic Image Synthesis},
-  author={Sch{\"o}nfeld, Edgar and Sushko, Vadim and Zhang, Dan and Gall, Juergen and Schiele, Bernt and Khoreva, Anna},
-  booktitle={International Conference on Learning Representations},
-  year={2021}
+@inproceedings{,
+  title={},
+  author={},
+  booktitle={},
+  year={2024}
 }   
 ```
+## Results
+
+The generated images of our model are shown below:
+![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/combined_generated1.png)
+This is the first edition of the model. They are not rewarding as the shape of the generated images vary a lot, the shape consistency is not 
+good enough, especially at the boundary. So we use Mask Loss to enhance shape consistency. The basic idea is very straightforward and shown below.
+![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/maskloss.png)
+After implementation:
+![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/combined_generated2.png)
+
+
+
+
 
 ## License
 
@@ -119,7 +134,6 @@ maintained nor monitored in any way.
 Please feel free to open an issue or contact us personally if you have questions, need help, or need explanations.
 Write to one of the following email addresses, and maybe put one other in the cc:
 
-edgarschoenfeld@live.de  
-vad221@gmail.com  
-edgar.schoenfeld@bosch.com  
-vadim.sushko@bosch.com  
+twwinde@gmail.com  
+st180408@stud.uni-stuttgart.de
+
