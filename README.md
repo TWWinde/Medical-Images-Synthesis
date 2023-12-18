@@ -8,7 +8,7 @@ labels, and an unlabeled dataset B with unlabeled images from another modality (
 task is to translate the semantic maps from dataset A to images from dataset B. Several challenges 
 exist in this task due to the scarcity of the labels, and the heterogeneity of the data (from different 
 patients and modalities).
-![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/ctvsmri.jpg)
+![img.png](https://github.com/TWWinde/Medical-Images-Synthesis/blob/main/assert/ctvsmri.png)
 
 
 # Overview
