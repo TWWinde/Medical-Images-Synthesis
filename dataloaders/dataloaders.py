@@ -7,7 +7,8 @@ def get_dataset_name(mode):
     if mode == "medicals_no_3d_noise":
         return "MedicalImagesDataset"
     else:
-        ValueError("There is no such dataset regime as %s" % mode)
+        return "MedicalImagesDataset"
+        #ValueError("There is no such dataset regime as %s" % mode)
 
 def get_dataloaders(opt):
     dataset_name   = get_dataset_name(opt.dataset_mode)

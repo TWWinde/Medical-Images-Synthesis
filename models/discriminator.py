@@ -792,6 +792,8 @@ class WaveletDiscriminator(nn.Module):
             second_dimension = 2
         elif opt.dataset_mode == "medicals" or opt.dataset_mode == "medicals_no_3d_noise":
             second_dimension = 4
+        else:
+            second_dimension = 4
 
 
         self.final_linear = nn.Sequential(
