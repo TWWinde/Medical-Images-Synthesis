@@ -106,7 +106,7 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         file_list_image = os.listdir(path_img)
         # print(file_list_image[1]) slice_25_181.png
         #path_lab = os.path.join(self.opt.dataroot, mode, "labels")
-        path_lab = os.path.join(self.opt.dataroot,'ct', mode, "labels")
+        path_lab = os.path.join(self.opt.dataroot, 'ct', mode, "labels")
         file_list_label = os.listdir(path_lab)
 
         if mode == 'test':
