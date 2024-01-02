@@ -4,7 +4,7 @@ import models.models as models
 import dataloaders.dataloaders as dataloaders
 import utils.utils as utils
 from utils.fid_scores import fid_pytorch
-from utils.miou_scores import miou_pytorch
+#from utils.miou_scores import miou_pytorch
 from utils.Metrics import metrics
 
 import config
@@ -22,7 +22,7 @@ print('data successfully loaded')
 im_saver = utils.image_saver(opt)
 #fid_computer = fid_pytorch(opt, dataloader_val)
 metrics_computer = metrics(opt, dataloader_val)
-miou_computer = miou_pytorch(opt,dataloader_val)
+#miou_computer = miou_pytorch(opt,dataloader_val)
 
 #--- create models ---#
 model = models.Unpaired_model(opt)
@@ -122,7 +122,7 @@ for epoch in range(start_epoch, opt.num_epochs):
             metrics_computer.update_metrics(model, cur_iter)
             #if is_best:
                 #utils.save_networks(opt, cur_iter, model, best=True)
-        _ = miou_computer.update(model,cur_iter)   #  do not have miou model yet
+        #_ = miou_computer.update(model,cur_iter)   #  do not have miou model yet
         visualizer_losses(cur_iter, losses_G_list+p_losses_G_list+losses_D_list+losses_Du_list+losses_reg_list)
 
 
