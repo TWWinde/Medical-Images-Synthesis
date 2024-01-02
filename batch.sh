@@ -2,7 +2,7 @@
 
 #Slurm parameters
 #SBATCH --job-name=medical
-#SBATCH --output=medical%j.%N.out
+#SBATCH --output=MRI%j.%N.out
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=6-23:00:00
