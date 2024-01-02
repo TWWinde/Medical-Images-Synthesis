@@ -89,8 +89,8 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         label = Image.open(self.labels[idx])
         image, label = self.transforms(image, label)
         label = np.asarray(label)
-        unique_values1 = set()
-        pixels = label.flatten().tolist()
+        #unique_values1 = set()
+        #pixels = label.flatten().tolist()
         if self.for_supervision:
             return {"image": image, "label": label, "name": self.images[self.mixed_index[idx]],
                     "weight": self.weights[self.mixed_index[idx]]}
@@ -101,20 +101,26 @@ class MedicalImagesDataset(torch.utils.data.Dataset):
         mode = "test" if self.opt.phase == "test" or self.for_metrics else "train" #####val
         images = []
         labels = []
-        path_img = os.path.join(self.opt.dataroot, mode, "images")
+        #path_img = os.path.join(self.opt.dataroot, mode, "images")
+        path_img = os.path.join(self.opt.dataroot, "mr", mode)
         file_list_image = os.listdir(path_img)
         # print(file_list_image[1]) slice_25_181.png
-        path_lab = os.path.join(self.opt.dataroot, mode, "labels")
+        #path_lab = os.path.join(self.opt.dataroot, mode, "labels")
+        path_lab = os.path.join(self.opt.dataroot,'ct', mode, "labels")
         file_list_label = os.listdir(path_lab)
+
         if mode == 'test':
             sorted_file_list_image = sorted(file_list_image, key=lambda x: (int(x.split('_')[1]), int(x.split('_')[-1].split('.')[0])))
             sorted_file_list_label = sorted(file_list_label, key=lambda x: (int(x.split('_')[1]), int(x.split('_')[-1].split('.')[0])))
         else:
             sorted_file_list_image = sorted(file_list_image, key=lambda x: int(re.search(r'\d+', x).group()))
             sorted_file_list_label = sorted(file_list_label, key=lambda x: int(re.search(r'\d+', x).group()))
+        #for item in sorted_file_list_image:
+            #images.append(os.path.join(path_img, item))
+        #for item in sorted_file_list_label:
+            #labels.append(os.path.join(path_lab, item))
         for item in sorted_file_list_image:
             images.append(os.path.join(path_img, item))
-        for item in sorted_file_list_label:
             labels.append(os.path.join(path_lab, item))
         assert len(images) == len(labels), "different len of images and labels %s - %s" % (len(images), len(labels))
 
