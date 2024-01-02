@@ -113,7 +113,6 @@ class metrics():
 
         print("--- Metrics at Iter %s: " % cur_iter, "{:.2f}".format(cur_pips),"{:.2f}".format(cur_ssim),"{:.2f}".format(cur_psnr),"{:.2f}".format(cur_rmse))
 
-
     def update_logs(self, cur_data, epoch, mode):
         try:
             np_file = np.load(os.path.join(self.path_to_save, mode, f"{mode}_log.npy"), allow_pickle=True)
@@ -134,6 +133,14 @@ class metrics():
         plt.grid(b=True, which='minor', color='#999999', linestyle='--', alpha=0.2)
         plt.savefig(os.path.join(self.path_to_save, mode, f"plot_{mode}"), dpi=600)
         plt.close()
+
+    def metrics_test(self, model):
+        print("--- test: computing FID ---")
+        pips, ssim, psnr, rmse = self.compute_metrics(model.module.netG, model.module.netEMA, model)
+        print("--- PIPS at test : ", "{:.2f}".format(pips))
+        print("--- SSIM at test : ", "{:.2f}".format(ssim))
+        print("--- PSNR at test : ", "{:.2f}".format(psnr))
+        print("--- RMSE at test : ", "{:.2f}".format(rmse))
 
 
 
