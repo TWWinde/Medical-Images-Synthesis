@@ -15,13 +15,16 @@ from torch.distributions import Categorical
 import os
 from utils.Metrics import metrics
 import nibabel as nib
+
+
 generate_images = False
 compare_miou = False
 compute_miou_generation = False
 compute_fid_generation = False
 compute_miou_segmentation_network = False
 compute_metrics = False
-generate_niffti = True
+generate_niffti = False
+compute_metrics = True
 
 from models.generator import WaveletUpsample, InverseHaarTransform, HaarTransform, WaveletUpsample2
 
@@ -92,6 +95,8 @@ _, _, dataloader_val = dataloaders.get_dataloaders(opt)
 # --- create utils ---#
 image_saver_combine = utils.results_saver(opt)
 image_saver = utils.results_saver_for_test(opt)
+metrics_computer = metrics(opt, dataloader_val)
+fid_computer = fid_pytorch(opt, dataloader_val)
 # --- create models ---#
 model = models.Unpaired_model(opt)
 # model = models.Unpaired_model_cycle(opt)
@@ -101,6 +106,10 @@ model.eval()
 
 mae = []
 mse = []
+
+if compute_metrics:
+    metrics_computer.metrics_test(model)
+    fid_computer.fid_test(model)
 
 if generate_niffti:
     j=0
