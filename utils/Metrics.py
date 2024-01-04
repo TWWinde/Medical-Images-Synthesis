@@ -43,6 +43,7 @@ class metrics():
         #pips_model = torchvision.models.vgg16(pretrained=True).features.eval()
         #pips_model = pips_model.cuda()
         loss_fn_alex = lpips.LPIPS(net='alex')
+        loss_fn_alex = loss_fn_alex.to('cuda:0')
         netG.eval()
         transform1 = transforms.Compose([
             transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # normalized to [0, 1]
@@ -71,11 +72,7 @@ class metrics():
                 ssim += [ssim_value]
                 # PIPS lpips
                 d = loss_fn_alex(input1, input2)
-                #feature1 = pips_model(input1)
-                #feature2 = pips_model(input2)
-                #pips_val = torch.cosine_similarity(feature1, feature2, dim=1)
                 pips.append(d.mean().item())
-                #pips += [pips_val.mean()]
                 # PSNR, RMSE
                 input1 = transform1(generated)
                 input2 = transform1(image)
@@ -95,7 +92,7 @@ class metrics():
         avg_psnr = sum(psnr) / total_samples
         avg_rmse = sum(rmse) / total_samples
         avg_pips = np.array(avg_pips)
-        avg_ssim = np.array(avg_ssim)
+        avg_ssim = np.array(avg_ssim.cpu())
         avg_psnr = np.array(avg_psnr)
         avg_rmse = np.array(avg_rmse)
 
