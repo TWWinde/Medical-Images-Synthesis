@@ -278,6 +278,10 @@ def save_networks(opt, cur_iter, model, latest=False, best=False):
         except:
             pass
         try:
+            torch.save(model.module.netS.state_dict(), path+'/%s_S.pth' % ("latest"))
+        except:
+            pass
+        try:
             torch.save(model.module.netDu_image.state_dict(), path + '/%s_Du_image.pth' % ("latest"))
             torch.save(model.module.netDu_label.state_dict(), path + '/%s_Du_label.pth' % ("latest"))
         except:
@@ -294,6 +298,10 @@ def save_networks(opt, cur_iter, model, latest=False, best=False):
         torch.save(model.module.netG.state_dict(), path+'/%s_G.pth' % ("best"))
         try:
             torch.save(model.module.netD.state_dict(), path+'/%s_D.pth' % ("best"))
+        except:
+            pass
+        try:
+            torch.save(model.module.netS.state_dict(), path + '/%s_S.pth' % ("best"))
         except:
             pass
         try:
