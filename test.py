@@ -22,7 +22,6 @@ compare_miou = False
 compute_miou_generation = False
 compute_fid_generation = False
 compute_miou_segmentation_network = False
-compute_metrics = False
 generate_niffti = False
 compute_metrics = True
 
