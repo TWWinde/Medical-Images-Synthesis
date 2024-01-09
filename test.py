@@ -25,9 +25,9 @@ compute_miou_segmentation_network = False
 generate_niffti = False
 compute_metrics = True
 
-from models.generator import WaveletUpsample, InverseHaarTransform, HaarTransform, WaveletUpsample2
+#from models.generator import WaveletUpsample, InverseHaarTransform, HaarTransform, WaveletUpsample2
 
-wavelet_upsample = WaveletUpsample()
+#wavelet_upsample = WaveletUpsample()
 
 # from pytorch_wavelets import DWTForward, DWTInverse # (or import DWT, IDWT)
 # xfm = DWTForward(J=3, mode='zero', wave='db3')  # Accepts all wave types available to PyWavelets
@@ -35,7 +35,7 @@ wavelet_upsample = WaveletUpsample()
 
 from utils.utils import tens_to_im
 import numpy as np
-from torch.autograd import Variable
+#from torch.autograd import Variable
 
 
 def fast_hist(pred, label, n):
