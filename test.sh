@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
 #Slurm parameters
-#SBATCH --job-name=medical
-#SBATCH --output=MRI%j.%N.out
+#SBATCH --job-name=med_test
+#SBATCH --output=med_test%j.%N.out
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=6-23:00:00
