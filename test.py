@@ -1,114 +1,83 @@
-import cv2
-from PIL import Image
-from numpy import generic
-from torchvision.transforms import functional
 import models.models as models
 import dataloaders.dataloaders as dataloaders
-import utils.utils as utils
+import util.utils as utils
 import config
-from utils.fid_scores import fid_pytorch
-from utils.drn_segment import drn_105_d_miou as drn_105_d_miou
+from util.fid_scores import fid_pytorch
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-import torch
-from torch.distributions import Categorical
-import os
-from utils.Metrics import metrics
-import nibabel as nib
 
+from util.Metrics import metrics
 
 generate_images = False
-compare_miou = False
-compute_miou_generation = False
 compute_fid_generation = False
-compute_miou_segmentation_network = False
-generate_niffti = False
-compute_metrics = True
+generate_combined_images = True
+compute_metrics = False
 
-#from models.generator import WaveletUpsample, InverseHaarTransform, HaarTransform, WaveletUpsample2
 
-#wavelet_upsample = WaveletUpsample()
 
-# from pytorch_wavelets import DWTForward, DWTInverse # (or import DWT, IDWT)
-# xfm = DWTForward(J=3, mode='zero', wave='db3')  # Accepts all wave types available to PyWavelets
-# ifm = DWTInverse(mode='zero', wave='db3')
-
-from utils.utils import tens_to_im
+#from util.utils import tens_to_im
 import numpy as np
 #from torch.autograd import Variable
 
-
-def fast_hist(pred, label, n):
-    k = (label >= 0) & (label < n)
-    return np.bincount(
-        n * label[k].astype(int) + pred[k], minlength=n ** 2).reshape(n, n)
-
-
-def per_class_iu(hist):
-    return np.diag(hist) / (hist.sum(1) + hist.sum(0) - np.diag(hist) + 1e-10)
-
-
-def compute_iou(pred_mask, gt_mask):
-    intersection = np.logical_and(pred_mask, gt_mask)
-    union = np.logical_or(pred_mask, gt_mask)
-    if np.sum(union) == 0:
-        return 0.0
-    iou = np.sum(intersection) / np.sum(union)
-    return iou
-
-
-def compute_miou(folder1, folder2):
-    image_name_list1 = [f for f in sorted(os.listdir(folder1)) if f.endswith(".png")]
-    image_name_list2 = [f for f in sorted(os.listdir(folder2)) if f.endswith(".png")]
-    num_classes = 37
-    class_ious = np.zeros(num_classes)
-    image_name_list = list(set(image_name_list1) & set(image_name_list2))
-    for class_idx in range(num_classes):
-        ious = []
-        for image_name in image_name_list:
-            # mask_img = np.array(Image.open(os.path.join(gt_folder, gt_file)).convert('L')).astype(np.uint8)
-            # print(mask_img)
-            mask1 = np.array(Image.open(os.path.join(folder1, image_name))).astype(np.uint8) == class_idx
-            # print('shape1',pred_mask.shape)
-            mask2 = np.array(Image.open(os.path.join(folder2, image_name))).astype(np.uint8) == class_idx
-            # print('shape2',gt_mask.shape)
-            iou = compute_iou(mask1, mask2)
-            ious.append(iou)
-        nonzero_ious = ious[ious != 0]
-        class_ious[class_idx] = np.mean(nonzero_ious)
-        print('Class idx', class_idx, 'ious', np.mean(ious))
-    mIoU = np.mean(class_ious)
-    print('mIoU ', mIoU)
-    return mIoU
-
-
 from collections import namedtuple
 
-# --- read options ---#
+
+#--- read options ---#
 opt = config.read_arguments(train=False)
-print(opt.phase)
 
-# --- create dataloader ---#
-_, _, dataloader_val = dataloaders.get_dataloaders(opt)
+#--- create dataloader ---#
+_, dataloader_val = dataloaders.get_dataloaders(opt)
 
-# --- create utils ---#
-image_saver_combine = utils.results_saver(opt)
-image_saver = utils.results_saver_for_test(opt)
+#--- create utils ---#
+image_saver = utils.results_saver(opt)
+image_saver_combine = utils.combined_images_saver(opt)
 metrics_computer = metrics(opt, dataloader_val)
 fid_computer = fid_pytorch(opt, dataloader_val)
-# --- create models ---#
+#--- create models ---#
 model = models.Unpaired_model(opt)
-# model = models.Unpaired_model_cycle(opt)
 model = models.put_on_multi_gpus(model, opt)
-utils.load_networks(opt, model)
 model.eval()
 
 mae = []
 mse = []
+len_dataloader = len(dataloader_val)
+
+if generate_images:
+    #--- iterate over validation set ---#
+    for i, data_i in tqdm(enumerate(dataloader_val)):
+        image, label = models.preprocess_input(opt, data_i)
+        generated = model(image, label, "generate", None).cpu().detach()
+        image_saver(label, generated, data_i["name"])
+
 
 if compute_metrics:
     metrics_computer.metrics_test(model)
     fid_computer.fid_test(model)
+
+
+if generate_combined_images:
+    # --- iterate over validation set ---#
+    for i, data_i in tqdm(enumerate(dataloader_val)):
+
+        label_save = data_i['label'].long()
+        label_save = np.array(label_save).astype(np.uint8).squeeze(1)
+        mr_image, ct_image, label = models.preprocess_input(opt, data_i, test=True)
+        generated1 = model(None, label, "generate", None).cpu().detach()
+        generated2 = model(None, label, "generate", None).cpu().detach()
+        generated3 = model(None, label, "generate", None).cpu().detach()
+        generated4 = model(None, label, "generate", None).cpu().detach()
+
+        image_saver_combine(label, generated1, generated2, generated3, generated4, mr_image,ct_image, data_i["name"])
+
+
+
+
+
+
+
+
+
+
+
 
 if generate_niffti:
     j=0
@@ -208,33 +177,6 @@ if generate_images:
 # print(np.array(mae).mean())
 # print(np.array(mse).mean())
 
-if compare_miou:
-    pred_folder_generated = os.path.join('/no_backups/s1449/OASIS/results', 'medicals', 'test', 'segmentation')
-    pred_folder_real = os.path.join('/no_backups/s1449/OASIS/results', 'medicals', 'test',
-                                         'segmentation_real')
-    gt_folder = os.path.join('/no_backups/s1449/OASIS/results', 'medicals', 'test', 'label')
-    answer = compute_miou(pred_folder_generated, pred_folder_real)
-    print('miou of fake images segmentation and real images segmentation ', answer)
-    answer = compute_miou(pred_folder_generated, gt_folder)
-    print('miou of fake images segmentation and gt label ', answer)
-    answer = compute_miou(pred_folder_real, gt_folder)
-    print('miou of real images segmentation and gt label ', answer)
-    print('#####################################new model#########################################')
-    pred_folder_generated = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'segmentation')
-    pred_folder_real = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test',
-                                    'segmentation_real')
-    gt_folder = os.path.join('/no_backups/s1449/Medical-Images-Synthesis/results', 'medicals', 'test', 'label')
-    answer = compute_miou(pred_folder_generated, pred_folder_real)
-    print('miou of fake images segmentation and real images segmentation ', answer)
-    answer = compute_miou(pred_folder_generated, gt_folder)
-    print('miou of fake images segmentation and gt label ', answer)
-    answer = compute_miou(pred_folder_real, gt_folder)
-    print('miou of real images segmentation and gt label ', answer)
-
-'''print(drn_105_d_miou(opt.results_dir,opt.name,'latest'))
-print(drn_105_d_miou(opt.results_dir,opt.name,'20000'))
-print(drn_105_d_miou(opt.results_dir,opt.name,'40000'))
-print(drn_105_d_miou(opt.results_dir,opt.name,'60000'))'''
 
 if compute_miou_generation:
     print(drn_105_d_miou(opt.results_dir, opt.name, opt.ckpt_iter))
@@ -277,66 +219,3 @@ else:
     else:
         print(sercon[first.index(float(opt.ckpt_iter))])
 
-if compute_miou_segmentation_network:
-    hist = np.zeros((35, 35))
-    for i, data_i in tqdm(enumerate(dataloader_val)):
-        image, label = models.preprocess_input(opt, data_i)
-        generated_image = model(image, label, "generate", None)
-        # plt.imshow(generated_plot)
-        # plt.figure()
-        generated = model(image, label, "segment_real", None)
-        """generated_entropy = generated[0].cpu()-1
-        pixel_entropy = torch.zeros(generated_entropy.size()[1:])
-        generated_entropy = generated_entropy.permute((1,2,0))
-        generated_entropy = Categorical(logits=generated_entropy).entropy().detach()"""
-        '''plt.imshow(generated_entropy)'''
-
-        """for j,row in enumerate(pixel_entropy) :
-            for k,_ in enumerate(row) :
-                pixel_entropy[j,k] = Categorical(probs= generated_entropy[:,j,k]).entropy()
-        #generated_plot = torch.argmax(generated, 1).cpu()
-        plt.imshow(pixel_entropy)"""
-        generated_plot = torch.argmax(generated, 1)[0].cpu() - 1
-        """original_label = torch.argmax(label,1)[0].cpu()
-        error_plot = generated_plot != original_label"""
-        '''    plt.figure()
-        plt.imshow(error_plot.float())
-    
-        plt.figure()
-        plt.imshow(tens_to_im(generated_image[0]))'''
-
-        """plt.figure()
-        plt.imshow(tens_to_im(image.cpu()[0]))
-        generated = model(None, label, "generate", None)
-        image_saver(label, generated, data_i["name"])
-        plt.figure()
-        plt.imshow(tens_to_im(generated.cpu()[0]))"""
-
-        hist += fast_hist(generated_plot.flatten().numpy(), torch.argmax(label, 1).flatten().cpu().numpy(), 35)
-
-        ious = per_class_iu(hist)
-        reduced_ius = np.zeros(19)
-        for j, iu in enumerate(ious):
-            for gt_label in labels:
-                if gt_label.id == j and gt_label.trainId != 255:
-                    reduced_ius[gt_label.trainId] = iu
-
-        print('===> mAP {mAP:.3f}'.format(
-            mAP=round(np.nanmean(reduced_ius) * 100, 2)), end="\r")
-
-        if (i % 100) == 0:
-            plt.figure()
-            plt.imshow(hist, cmap='hot')
-            plt.show()
-
-    ious = per_class_iu(hist) * 100
-    reduced_ius = np.zeros(19)
-    for i, iu in enumerate(ious):
-        for gt_label in labels:
-            if gt_label.id == i and gt_label.trainId != 255:
-                reduced_ius[gt_label.trainId] = iu
-
-    print(' '.join('{:.03f}'.format(i) for i in reduced_ius))
-    print(' '.join('{:.03f}'.format(i) for i in ious))
-    print(round(np.nanmean(reduced_ius), 2))
-    print(round(np.nanmean(ious), 2))
