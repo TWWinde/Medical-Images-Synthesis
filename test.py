@@ -17,7 +17,7 @@ from utils.Metrics import metrics
 import nibabel as nib
 
 
-generate_images = False
+generate_images = True
 compare_miou = False
 compute_miou_generation = False
 compute_fid_generation = False
@@ -109,6 +109,8 @@ mse = []
 if compute_metrics:
     metrics_computer.metrics_test(model)
     fid_computer.fid_test(model)
+
+
 
 if generate_niffti:
     j=0
