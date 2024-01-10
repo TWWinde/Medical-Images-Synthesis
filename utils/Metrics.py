@@ -42,7 +42,7 @@ class metrics():
         pips, ssim, psnr, rmse  = [], [], [], []
         #pips_model = torchvision.models.vgg16(pretrained=True).features.eval()
         #pips_model = pips_model.cuda()
-        loss_fn_alex = lpips.LPIPS(net='alex')
+        loss_fn_alex = lpips.LPIPS(net='vgg')
         loss_fn_alex = loss_fn_alex.to('cuda:0')
         netG.eval()
         transform1 = transforms.Compose([
