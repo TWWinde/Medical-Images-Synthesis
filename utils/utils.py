@@ -75,11 +75,11 @@ class results_saver():
         width, height = im_label.shape[1], im_label.shape[0]
         combined_image = Image.new("RGB", (width * 6, height))
         combined_image.paste(Image.fromarray(im_label), (0, 0))
-        combined_image.paste(Image.fromarray(im_image1), (width, 0))
+        combined_image.paste(Image.fromarray(im_image5), (width, 0))
         combined_image.paste(Image.fromarray(im_image2), (width * 2, 0))
         combined_image.paste(Image.fromarray(im_image3), (width * 3, 0))
         combined_image.paste(Image.fromarray(im_image4), (width * 4, 0))
-        combined_image.paste(Image.fromarray(im_image5), (width * 5, 0))
+        combined_image.paste(Image.fromarray(im_image1), (width * 5, 0))
         return combined_image
 
     def save_combined_image(self, combined_image, name):
