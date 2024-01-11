@@ -6,21 +6,20 @@ from scipy import linalg # For numpy FID
 from pathlib import Path
 from PIL import Image
 import models.models as models
-from utils.fid_folder.inception import InceptionV3
 import matplotlib.pyplot as plt
 import torchvision.models
 import cv2
 import torch
 import torchvision.transforms as transforms
 import pytorch_msssim
-from pytorch_msssim import ssim
 import lpips
 import torch
+import torch.nn.functional as F
+from skimage.metrics import structural_similarity as ssim
 from skimage.metrics import peak_signal_noise_ratio, mean_squared_error
 # --------------------------------------------------------------------------#
 # This code is to calculate and save SSIM PIPS PSNR RMSE
 # --------------------------------------------------------------------------#
-
 
 
 class metrics():
@@ -38,18 +37,16 @@ class metrics():
         Path(self.path_to_save_PSNR).mkdir(parents=True, exist_ok=True)
         Path(self.path_to_save_RMSE).mkdir(parents=True, exist_ok=True)
 
-    def compute_metrics(self, netG, netEMA, model = None):
+    def compute_metrics(self, netG, netEMA, model=None):
         pips, ssim, psnr, rmse  = [], [], [], []
-        #pips_model = torchvision.models.vgg16(pretrained=True).features.eval()
-        #pips_model = pips_model.cuda()
         loss_fn_alex = lpips.LPIPS(net='vgg')
         loss_fn_alex = loss_fn_alex.to('cuda:0')
         netG.eval()
         transform1 = transforms.Compose([
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # normalized to [0, 1]
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # [0, 1]normalized to [—1, 1]
         ])
         transform2 = transforms.Compose([
-            transforms.Normalize(mean=[0, 0, 0], std=[0.5, 0.5, 0.5])  # normalized to [-1, 1]
+            transforms.Normalize(mean=[0, 0, 0], std=[1, 1, 1])  # normalized to [0, 1]
         ])
         if not self.opt.no_EMA:
             netEMA.eval()
@@ -57,25 +54,22 @@ class metrics():
         total_samples = len(self.val_dataloader)
         with torch.no_grad():
             for i, data_i in enumerate(self.val_dataloader):
-                image, label = models.preprocess_input(self.opt, data_i)
-                edges = model.module.compute_edges(image)
+                image, _,  label = models.preprocess_input(self.opt, data_i, test=True)
                 if self.opt.no_EMA:
-                    generated = netG(label, edges=edges)
+                    generated = netG(label)
                 else:
-                    generated = netEMA(label, edges=edges)  # [2, 3, 256, 256] [-1,1]
+                    generated = netEMA(label)  # [2, 3, 256, 256] [-1,1]
+
+                input1 = (generated + 1) / 2
+                input2 = (image + 1) / 2
 
                 # SSIM
-                input1 = transform2(generated)
-                input2 = transform2(image)
                 ssim_value = pytorch_msssim.ssim(input1, input2)
                 ssim.append(ssim_value.mean().item())
-                ssim += [ssim_value]
                 # PIPS lpips
                 d = loss_fn_alex(input1, input2)
                 pips.append(d.mean().item())
                 # PSNR, RMSE
-                input1 = transform1(generated)
-                input2 = transform1(image)
                 mse = torch.nn.functional.mse_loss(input1, input2)
                 max_pixel_value = 1.0
                 psnr_value = 10 * torch.log10((max_pixel_value ** 2) / mse)
@@ -92,13 +86,11 @@ class metrics():
         avg_psnr = sum(psnr) / total_samples
         avg_rmse = sum(rmse) / total_samples
         avg_pips = np.array(avg_pips)
-        avg_ssim = np.array(avg_ssim.cpu())
+        avg_ssim = np.array(avg_ssim)
         avg_psnr = np.array(avg_psnr)
         avg_rmse = np.array(avg_rmse)
 
         return avg_pips, avg_ssim, avg_psnr, avg_rmse
-
-
 
     def update_metrics(self, model, cur_iter):
         print("--- Iter %s: computing PIPS SSIM PSNR RMSE---" % (cur_iter))
@@ -135,7 +127,7 @@ class metrics():
         print("--- test: computing FID ---")
         pips, ssim, psnr, rmse = self.compute_metrics(model.module.netG, model.module.netEMA, model)
         print("--- PIPS at test : ", "{:.2f}".format(pips))
-        print("--- SSIM at test : ", "{:.2f}".format(ssim))
+        print("--- SSIM at test : ", "{:.5f}".format(ssim))
         print("--- PSNR at test : ", "{:.2f}".format(psnr))
         print("--- RMSE at test : ", "{:.2f}".format(rmse))
 
