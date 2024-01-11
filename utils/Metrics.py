@@ -54,7 +54,7 @@ class metrics():
         total_samples = len(self.val_dataloader)
         with torch.no_grad():
             for i, data_i in enumerate(self.val_dataloader):
-                image, _,  label = models.preprocess_input(self.opt, data_i, test=True)
+                image, label = models.preprocess_input(self.opt, data_i)
                 if self.opt.no_EMA:
                     generated = netG(label)
                 else:
