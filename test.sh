@@ -43,10 +43,11 @@ module load cuda
 
 CUDA_VISIBLE_DEVICES=0 python test.py --name medical_no3dnoise --dataset_mode medicals --gpu_ids 0 \
 --dataroot /misc/data/private/autoPET/data_nnunet  \
---batch_size 20 --model_supervision 0 --add_mask \
+--batch_size 20 --model_supervision 0  \
 --netG 0 --channels_G 64 \
+--no_3dnoise
 
 #CUDA_VISIBLE_DEVICES=0 python test.py --name medical_no3dmask --dataset_mode medicals --gpu_ids 0 \
 #--dataroot /misc/data/private/autoPET/data_nnunet  \
-#--batch_size 20 --model_supervision 0 --add_mask \
+#--batch_size 20 --model_supervision 0 \
 #--netG 0 --channels_G 64 \
