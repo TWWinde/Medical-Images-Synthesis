@@ -38,5 +38,4 @@ module load cuda
 CUDA_VISIBLE_DEVICES=0 python train.py --name medicals --dataset_mode medicals --gpu_ids 0 \
 --dataroot /misc/data/private/autoPET/data_nnunet  \
 --batch_size 2ß --model_supervision 0 --add_mask \
---Du_patch_size 32 --netDu wavelet  \
 --netG 0 --channels_G 64 \
