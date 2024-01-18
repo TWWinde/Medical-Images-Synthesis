@@ -2,14 +2,9 @@ import torch
 from torch import nn
 import numpy as np
 import cv2
-from skimage.measure import label
-from scipy import ndimage as ndi
 from skimage import (exposure, feature, filters, io, measure,
                      morphology, restoration, segmentation, transform,
                      util)
-import skimage
-import matplotlib.pyplot as plt
-#import torch.nn.functional as F
 import torchvision.transforms.functional as F
 class MaskFilter(nn.Module):
     def __init__(self, use_cuda=False):
@@ -54,12 +49,14 @@ class MaskFilter(nn.Module):
         return torch.tensor(mask, dtype=torch.float32).to(self.device)#mask.astype(np.float32)
 
     def forward(self, input, label=True):
+        #input = torch.tensor(input) for test
         if label:
             input = torch.argmax(input, dim=1, keepdim=True)
             input = input.expand(-1, 3, -1, -1)
         B, C, H, W = input.shape
-        #mask = torch.zeros((B, C, H, W)).to(self.device)
+        mask = torch.zeros((B, C, H, W)).to(self.device)
         if label:
+
             mask = self.get_3d_mask(input, min_=0, label=label)
         else:
             mask = self.get_3d_mask(input, min_=-1, label=label)
@@ -68,12 +65,14 @@ class MaskFilter(nn.Module):
 
 
 if __name__ == '__main__':  #
-    for i in range(0, 606, 2):
-        label = cv2.imread(f'/Users/tangwenwu/Desktop/thesis/data/train/SEG/SEG_slice_{i // 2}.png')
-        image = cv2.imread(f'/Users/tangwenwu/Desktop/thesis/data/train/CT/CT_slice_{i // 2}.png')
+    for i in range(2, 260, 2):
+        label = cv2.imread(f'/Users/tangwenwu/Desktop/thesis/data/brain_pelvis/1PA014/labels/slice_{i // 2}.png')
+        image = cv2.imread(f'/Users/tangwenwu/Desktop/thesis/data/brain_pelvis/1PA014/mr_slices/slice_{i // 2}.png')
         maskfilter = MaskFilter()
         mask_label = maskfilter(label, label=True)
         mask_image = maskfilter(image, label=False)
+        mask_image = np.asarray(mask_image)*255
+        mask_label = np.asarray(mask_label)*255
         # cv2.imwrite(f'/Users/tangwenwu/Desktop/thesis/data/train/check/slice_{i//3}.png', image)
-        cv2.imwrite(f'/Users/tangwenwu/Desktop/thesis/data/train/check/slice_{i}.png', mask_image)  # image_mask 偶数
-        cv2.imwrite(f'/Users/tangwenwu/Desktop/thesis/data/train/check/slice_{i + 1}.png', mask_label)  # label_mask 奇数
+        cv2.imwrite(f'/Users/tangwenwu/Desktop/thesis/data/brain_pelvis/1PA014/test/slice_{i}.png', mask_image)  # image_mask 偶数
+        cv2.imwrite(f'/Users/tangwenwu/Desktop/thesis/data/brain_pelvis/1PA014/test/slice_{i + 1}.png', mask_label)  # label_mask 奇数

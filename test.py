@@ -17,7 +17,7 @@ from utils.Metrics import metrics
 import nibabel as nib
 
 
-generate_images = True
+generate_images = False
 compare_miou = False
 compute_miou_generation = False
 compute_fid_generation = False
