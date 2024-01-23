@@ -56,12 +56,21 @@ module load cuda
 #--num_epochs 500
 
 #experiments_3 AutoPET
-CUDA_VISIBLE_DEVICES=0 python train.py --name Wavelet_CT --dataset_mode medicals --gpu_ids 0 \
+#CUDA_VISIBLE_DEVICES=0 python train.py --name Wavelet_CT --dataset_mode medicals --gpu_ids 0 \
+#--dataroot /misc/data/private/autoPET/data_nnunet   \
+#--batch_size 4 --model_supervision 0 --add_mask \
+#--Du_patch_size 32 --netDu wavelet  \
+#--netG 9 --channels_G 16 \
+#--num_epochs 500
+
+#experiments_4 AutoPET wavelet_withoutmask
+CUDA_VISIBLE_DEVICES=0 python train.py --name Wavelet_CT_nomask --dataset_mode medicals --gpu_ids 0 \
 --dataroot /misc/data/private/autoPET/data_nnunet   \
---batch_size 4 --model_supervision 0 --add_mask \
+--batch_size 2 --model_supervision 0 --add_mask \
 --Du_patch_size 32 --netDu wavelet  \
 --netG 9 --channels_G 16 \
 --num_epochs 500
+
 
 
 #CUDA_VISIBLE_DEVICES=0 python test.py --name medicals --dataset_mode medicals --gpu_ids 0 \
