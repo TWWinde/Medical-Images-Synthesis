@@ -63,7 +63,7 @@ module load cuda
 #--netG 9 --channels_G 16 \
 #--num_epochs 500
 
-#experiments_4 AutoPET wavelet_withoutmask 117719
+#experiments_4 AutoPET wavelet_withoutmask 117727
 CUDA_VISIBLE_DEVICES=0 python train.py --name Wavelet_CT_nomask --dataset_mode medicals --gpu_ids 0 \
 --dataroot /misc/data/private/autoPET/data_nnunet   \
 --batch_size 2 --model_supervision 0  \
