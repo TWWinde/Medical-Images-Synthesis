@@ -95,7 +95,6 @@ class results_saver_for_test():
         self.path_to_save = {"label": self.path_label, "generated": self.path_generated, "groundtruth": self.path_groundtruth}
         os.makedirs(self.path_label, exist_ok=True)
         os.makedirs(self.path_generated, exist_ok=True)
-        os.makedirs(self.path_segmentation, exist_ok=True)
         os.makedirs(self.path_groundtruth, exist_ok=True)
         self.num_cl = opt.label_nc + 2
 
