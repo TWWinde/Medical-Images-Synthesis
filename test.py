@@ -17,7 +17,7 @@ from utils.Metrics import metrics
 import nibabel as nib
 
 
-generate_images = False
+generate_images = True
 compare_miou = False
 compute_miou_generation = False
 compute_fid_generation = False
@@ -181,13 +181,13 @@ if generate_images:
         generated4 = model(None, label, "generate", None).cpu().detach()
         arr = generated1.numpy()
 
-        #image_saver(label_save, generated1, groundtruth, data_i["name"])
+        image_saver(label_save, generated1, groundtruth, data_i["name"])
 
-        image_saver_combine(label, generated1, generated2, generated3, generated4, groundtruth, data_i["name"])
+        #image_saver_combine(label, generated1, generated2, generated3, generated4, groundtruth, data_i["name"])
         if k == 303:
             pass
 
-        if j == 2000:
+        if j == 200:
             break
         # plt.imshow(tens_to_im(generated[0]))
         # downsampled = torch.nn.functional.interpolate(generated,scale_factor = 0.5)
