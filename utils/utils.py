@@ -104,7 +104,7 @@ class results_saver_for_test():
             im = tens_to_lab_color(label[i], self.num_cl)
             self.save_im(im, "label", name[i])
             im = tens_to_im(generated[i]) * 255
-            self.save_im(im, "image", name[i])
+            self.save_im(im, "generated", name[i])
             im = tens_to_im(groundtruth[i]) * 255
             self.save_im(im, "groundtruth", name[i])
 
