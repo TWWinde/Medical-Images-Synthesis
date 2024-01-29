@@ -64,5 +64,5 @@ module load cuda
 #experiments_2
 CUDA_VISIBLE_DEVICES=0 python test.py --name Wavelet_CT_nomask --dataset_mode medicals --gpu_ids 0 \
 --dataroot /misc/data/private/autoPET/CT_MR  \
---batch_size 20 --model_supervision 0 --add_mask \
+--batch_size 20 --model_supervision 0  \
 --netG 9 --channels_G 16
